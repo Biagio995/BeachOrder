@@ -1,0 +1,16 @@
+{
+  "remote.autoForwardPorts": true,
+  "remote.autoForwardPortsSource": "process",
+  "remote.portsAttributes": {
+    "5173": {
+      "label": "Frontend (Vite)",
+      "onAutoForward": "openBrowser",
+      "requireLocalPort": true
+    },
+    "8000": {
+      "label": "Backend (Laravel)",
+      "onAutoForward": "silent",
+      "requireLocalPort": true
+    }
+  }
+}
