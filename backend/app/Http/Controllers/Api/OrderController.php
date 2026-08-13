@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\InventoryService;
 use App\Services\LocationAccessService;
@@ -119,7 +120,7 @@ class OrderController extends Controller
                 $addonSelections = $item['addons'] ?? [];
                 if ($addonSelections === [] && ! empty($item['addon_ids'])) {
                     $addonSelections = array_map(
-                        fn ($id) => ['id' => (int) $id, 'quantity' => 1],
+                        fn($id) => ['id' => (int) $id, 'quantity' => 1],
                         $item['addon_ids']
                     );
                 }
@@ -211,6 +212,11 @@ class OrderController extends Controller
 
         $session = $request->query('session');
         if ($session && $order->customer_session && hash_equals($order->customer_session, (string) $session)) {
+            if (in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
+                app(StripeOrderPaymentService::class)->syncPaymentStatus($order);
+                $order->refresh();
+            }
+
             $payload = $order->toArray();
             $payload['payment_receipt'] = app(StripeOrderPaymentService::class)->receiptFor($order);
 
@@ -240,6 +246,10 @@ class OrderController extends Controller
         $station = $request->query('station');
         if ($station && ! in_array($station, Order::STATIONS, true)) {
             $station = null;
+        }
+
+        if ($denied = $this->enforceStaffStationAccess($user, $station)) {
+            return $denied;
         }
 
         $hasOrdersManage = $user && RolePermissions::userHas($user, RolePermissions::ORDERS_MANAGE);
@@ -467,5 +477,32 @@ class OrderController extends Controller
         }
 
         return response()->json($order);
+    }
+
+    private function enforceStaffStationAccess(?User $user, ?string &$station): ?JsonResponse
+    {
+        if (! $user?->isStaffRole()) {
+            return null;
+        }
+
+        $position = $user->staffPosition();
+        if ($position === null) {
+            return response()->json(['message' => 'Staff position not assigned'], 403);
+        }
+
+        if (in_array($position, [User::STAFF_POSITION_KITCHEN, User::STAFF_POSITION_BAR], true)) {
+            if ($station !== null && $station !== $position) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+            $station = $position;
+
+            return null;
+        }
+
+        if ($position === User::STAFF_POSITION_WAITER && $station !== null) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return null;
     }
 }

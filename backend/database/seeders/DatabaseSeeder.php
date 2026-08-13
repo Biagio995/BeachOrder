@@ -74,14 +74,22 @@ class DatabaseSeeder extends Seeder
         $this->seedTenant($azure, [
             'admin' => ['Admin Azure', 'admin@azure.test'],
             'manager' => ['Manager Azure', 'manager@azure.test'],
-            'staff' => ['Staff Azure', 'staff@azure.test'],
+            'staff' => [
+                ['Kitchen Azure', 'kitchen@azure.test', User::STAFF_POSITION_KITCHEN],
+                ['Bar Azure', 'bar@azure.test', User::STAFF_POSITION_BAR],
+                ['Waiter Azure', 'waiter@azure.test', User::STAFF_POSITION_WAITER],
+            ],
             'menu_premium' => false,
         ]);
 
         $this->seedTenant($sunset, [
             'admin' => ['Admin Sunset', 'admin@sunset.test'],
             'manager' => ['Manager Sunset', 'manager@sunset.test'],
-            'staff' => ['Staff Sunset', 'staff@sunset.test'],
+            'staff' => [
+                ['Kitchen Sunset', 'kitchen@sunset.test', User::STAFF_POSITION_KITCHEN],
+                ['Bar Sunset', 'bar@sunset.test', User::STAFF_POSITION_BAR],
+                ['Waiter Sunset', 'waiter@sunset.test', User::STAFF_POSITION_WAITER],
+            ],
             'menu_premium' => true,
         ]);
 
@@ -95,7 +103,6 @@ class DatabaseSeeder extends Seeder
         foreach ([
             ['email' => $cfg['admin'][1], 'name' => $cfg['admin'][0], 'role' => User::ROLE_ADMIN],
             ['email' => $cfg['manager'][1], 'name' => $cfg['manager'][0], 'role' => User::ROLE_MANAGER],
-            ['email' => $cfg['staff'][1], 'name' => $cfg['staff'][0], 'role' => User::ROLE_STAFF],
         ] as $user) {
             User::query()->updateOrCreate(
                 ['email' => $user['email']],
@@ -104,10 +111,37 @@ class DatabaseSeeder extends Seeder
                     'name' => $user['name'],
                     'password' => Hash::make('password'),
                     'role' => $user['role'],
+                    'staff_position' => null,
                     'is_active' => true,
                 ]
             )->markEmailAsVerified();
         }
+
+        foreach ($cfg['staff'] as $staff) {
+            User::query()->updateOrCreate(
+                ['email' => $staff[1]],
+                [
+                    'tenant_id' => $tenant->id,
+                    'name' => $staff[0],
+                    'password' => Hash::make('password'),
+                    'role' => User::ROLE_STAFF,
+                    'staff_position' => $staff[2] ?? User::STAFF_POSITION_KITCHEN,
+                    'is_active' => true,
+                ]
+            )->markEmailAsVerified();
+        }
+
+        User::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('role', User::ROLE_STAFF)
+            ->whereNull('staff_position')
+            ->update(['staff_position' => User::STAFF_POSITION_KITCHEN]);
+
+        User::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('email', 'like', 'staff@%')
+            ->whereNotIn('email', array_column($cfg['staff'], 1))
+            ->delete();
 
         foreach ([
             ['name' => 'Ombrellone 12', 'slug' => 'ombrellone-12', 'type' => 'umbrella', 'code' => 'umbrella12', 'zone' => 'A', 'capacity' => 4],

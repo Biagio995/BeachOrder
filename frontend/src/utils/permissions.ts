@@ -5,6 +5,7 @@ export const PERMISSIONS = {
   ORDERS_MANAGE: 'orders.manage',
   ORDERS_VIEW: 'orders.view',
   ORDERS_UPDATE_STATUS: 'orders.update_status',
+  ORDERS_UPDATE_PAYMENT: 'orders.update_payment',
   QR_MANAGE: 'qr.manage',
   SETTINGS_MANAGE: 'settings.manage',
   PRODUCTS_AVAILABILITY: 'products.availability',
@@ -15,6 +16,19 @@ export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
 
 export type StaffRole = 'super_admin' | 'admin' | 'manager' | 'staff'
 
+export type StaffPosition = 'kitchen' | 'bar' | 'waiter'
+
+const STAFF_POSITION_PERMISSIONS: Record<StaffPosition, Permission[]> = {
+  kitchen: [PERMISSIONS.ORDERS_VIEW, PERMISSIONS.ORDERS_UPDATE_STATUS],
+  bar: [PERMISSIONS.ORDERS_VIEW, PERMISSIONS.ORDERS_UPDATE_STATUS],
+  waiter: [
+    PERMISSIONS.ORDERS_VIEW,
+    PERMISSIONS.ORDERS_UPDATE_STATUS,
+    PERMISSIONS.ORDERS_UPDATE_PAYMENT,
+    PERMISSIONS.WAITER_CALLS_MANAGE,
+  ],
+}
+
 const ROLE_PERMISSIONS: Record<StaffRole, Permission[]> = {
   super_admin: Object.values(PERMISSIONS),
   admin: [
@@ -23,6 +37,7 @@ const ROLE_PERMISSIONS: Record<StaffRole, Permission[]> = {
     PERMISSIONS.ORDERS_MANAGE,
     PERMISSIONS.ORDERS_VIEW,
     PERMISSIONS.ORDERS_UPDATE_STATUS,
+    PERMISSIONS.ORDERS_UPDATE_PAYMENT,
     PERMISSIONS.QR_MANAGE,
     PERMISSIONS.SETTINGS_MANAGE,
     PERMISSIONS.PRODUCTS_AVAILABILITY,
@@ -33,18 +48,21 @@ const ROLE_PERMISSIONS: Record<StaffRole, Permission[]> = {
     PERMISSIONS.ORDERS_MANAGE,
     PERMISSIONS.ORDERS_VIEW,
     PERMISSIONS.ORDERS_UPDATE_STATUS,
+    PERMISSIONS.ORDERS_UPDATE_PAYMENT,
     PERMISSIONS.QR_MANAGE,
     PERMISSIONS.PRODUCTS_AVAILABILITY,
   ],
-  staff: [
-    PERMISSIONS.ORDERS_VIEW,
-    PERMISSIONS.ORDERS_UPDATE_STATUS,
-    PERMISSIONS.WAITER_CALLS_MANAGE,
-  ],
+  staff: [],
 }
 
-export function permissionsForRole(role?: string | null): Permission[] {
+export function permissionsForRole(
+  role?: string | null,
+  staffPosition?: string | null,
+): Permission[] {
   if (!role) return []
+  if (role === 'staff') {
+    return STAFF_POSITION_PERMISSIONS[staffPosition as StaffPosition] ?? []
+  }
   return ROLE_PERMISSIONS[role as StaffRole] ?? []
 }
 

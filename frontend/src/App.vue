@@ -5,6 +5,8 @@ import { useI18n } from 'vue-i18n'
 import { useDisplay, useTheme } from 'vuetify'
 import { useAuthStore } from '@/stores/auth'
 import { PERMISSIONS } from '@/utils/permissions'
+import { homePathForRole } from '@/utils/roleHome'
+import { staffCanAccessRoute } from '@/utils/staffPosition'
 import { useCartStore } from '@/stores/cart'
 import { useMenuStore } from '@/stores/menu'
 import { useActiveOrderStore } from '@/stores/activeOrder'
@@ -95,7 +97,7 @@ const brandTo = computed(() => {
   if (isStaffArea.value) {
     if (!auth.isAuthenticated) return '/'
     if (auth.isSuperAdmin) return '/admin/tenants'
-    if (auth.isStaffRole) return '/kitchen'
+    if (auth.isStaffRole) return homePathForRole(auth.user?.role, auth.user?.staff_position)
     if (auth.can(PERMISSIONS.MENU_MANAGE) || auth.can(PERMISSIONS.ORDERS_MANAGE)) return '/admin'
     if (auth.can(PERMISSIONS.WAITER_CALLS_MANAGE)) return '/waiter'
     return '/admin'
@@ -345,9 +347,21 @@ function goStaff(path: string) {
           <v-chip v-if="auth.user?.tenant?.name" size="small" class="mr-2" variant="tonal" color="primary">
             {{ auth.user.tenant.name }}
           </v-chip>
-          <v-btn v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole" to="/kitchen" variant="text">{{ t('nav.kitchen') }}</v-btn>
-          <v-btn v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole" to="/bar" variant="text">{{ t('nav.bar') }}</v-btn>
-          <v-btn v-if="auth.can(PERMISSIONS.WAITER_CALLS_MANAGE) && auth.isStaffRole" to="/waiter" variant="text">{{ t('nav.waiter') }}</v-btn>
+          <v-btn
+            v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole && staffCanAccessRoute(auth.staffPosition, 'kitchen')"
+            to="/kitchen"
+            variant="text"
+          >{{ t('nav.kitchen') }}</v-btn>
+          <v-btn
+            v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole && staffCanAccessRoute(auth.staffPosition, 'bar')"
+            to="/bar"
+            variant="text"
+          >{{ t('nav.bar') }}</v-btn>
+          <v-btn
+            v-if="auth.can(PERMISSIONS.WAITER_CALLS_MANAGE) && auth.isStaffRole && staffCanAccessRoute(auth.staffPosition, 'waiter')"
+            to="/waiter"
+            variant="text"
+          >{{ t('nav.waiter') }}</v-btn>
           <v-btn
             v-if="auth.canAny([PERMISSIONS.MENU_MANAGE, PERMISSIONS.QR_MANAGE, PERMISSIONS.USERS_MANAGE, PERMISSIONS.SETTINGS_MANAGE])"
             :to="auth.isSuperAdmin ? '/admin/tenants' : '/admin'"
@@ -384,19 +398,19 @@ function goStaff(path: string) {
         </div>
         <v-list nav density="comfortable">
           <v-list-item
-            v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole"
+            v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole && staffCanAccessRoute(auth.staffPosition, 'kitchen')"
             prepend-icon="mdi-chef-hat"
             :title="t('nav.kitchen')"
             @click="goStaff('/kitchen')"
           />
           <v-list-item
-            v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole"
+            v-if="auth.can(PERMISSIONS.ORDERS_VIEW) && auth.isStaffRole && staffCanAccessRoute(auth.staffPosition, 'bar')"
             prepend-icon="mdi-glass-cocktail"
             :title="t('nav.bar')"
             @click="goStaff('/bar')"
           />
           <v-list-item
-            v-if="auth.can(PERMISSIONS.WAITER_CALLS_MANAGE) && auth.isStaffRole"
+            v-if="auth.can(PERMISSIONS.WAITER_CALLS_MANAGE) && auth.isStaffRole && staffCanAccessRoute(auth.staffPosition, 'waiter')"
             prepend-icon="mdi-room-service"
             :title="t('nav.waiter')"
             @click="goStaff('/waiter')"

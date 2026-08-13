@@ -25,6 +25,33 @@
       "options": { "cwd": "${workspaceFolder}/backend" },
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Backend: Reverb (8080)",
+      "type": "shell",
+      "command": "php artisan reverb:start",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "DevTunnel: Pubblica demo (5173)",
+      "type": "shell",
+      "command": "bash scripts/devtunnel-host.sh 5173",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "dependsOn": ["Frontend: DevTunnel (5173)"]
+    },
+    {
+      "label": "Test: Avvia stack completo",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Backend: Serve (8000)",
+        "Backend: Reverb (8080)",
+        "Frontend: DevTunnel (5173)"
+      ],
+      "problemMatcher": []
     }
   ]
 }

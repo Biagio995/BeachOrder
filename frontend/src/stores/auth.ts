@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (user.value?.permissions?.length) {
       return user.value.permissions
     }
-    return permissionsForRole(user.value?.role)
+    return permissionsForRole(user.value?.role, user.value?.staff_position)
   })
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
@@ -27,6 +27,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isAdmin = computed(() => user.value?.role === 'admin' || isSuperAdmin.value)
   const isManager = computed(() => user.value?.role === 'manager')
   const isStaffRole = computed(() => user.value?.role === 'staff')
+  const staffPosition = computed(() =>
+    user.value?.role === 'staff' ? user.value.staff_position ?? null : null,
+  )
 
   function can(permission: Permission): boolean {
     return hasPermission(permissions.value, permission, user.value?.role)
@@ -159,6 +162,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     isManager,
     isStaffRole,
+    staffPosition,
     can,
     canAny,
     PERMISSIONS,

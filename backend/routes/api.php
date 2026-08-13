@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Route;
 | Stripe webhooks (no auth — verified via signature)
 |--------------------------------------------------------------------------
 */
+
 Route::post('/webhooks/stripe', StripeWebhookController::class);
 Route::post('/webhooks/pos/{tenant}', PosWebhookController::class);
 
@@ -103,37 +104,37 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'tenant.user', 'throttle:120,1'])->group(function () {
-    Route::middleware('permission:'.RolePermissions::SETTINGS_MANAGE)->prefix('admin')->group(function () {
+    Route::middleware('permission:' . RolePermissions::SETTINGS_MANAGE)->prefix('admin')->group(function () {
         Route::post('subscription/checkout', [SubscriptionController::class, 'checkout']);
     });
 });
 
 Route::middleware(['auth:sanctum', 'tenant.user', 'verified', 'throttle:120,1'])->group(function () {
-    Route::middleware('permission:'.RolePermissions::SETTINGS_MANAGE)->prefix('admin')->group(function () {
+    Route::middleware('permission:' . RolePermissions::SETTINGS_MANAGE)->prefix('admin')->group(function () {
         Route::get('subscription', [SubscriptionController::class, 'show']);
         Route::post('subscription/portal', [SubscriptionController::class, 'portal']);
     });
-    Route::middleware(['subscription.active', 'permission:'.RolePermissions::ORDERS_VIEW])->group(function () {
+    Route::middleware(['subscription.active', 'permission:' . RolePermissions::ORDERS_VIEW])->group(function () {
         Route::get('/orders', [OrderController::class, 'index']);
     });
 
-    Route::middleware(['subscription.active', 'permission:'.RolePermissions::ORDERS_UPDATE_STATUS])->group(function () {
+    Route::middleware(['subscription.active', 'permission:' . RolePermissions::ORDERS_UPDATE_STATUS])->group(function () {
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
         Route::post('/orders/{order}/print', [OrderPrintController::class, 'store']);
         Route::get('/orders/{order}/print-logs', [OrderPrintController::class, 'logs']);
     });
 
-    Route::middleware(['subscription.active', 'permission:'.RolePermissions::ORDERS_MANAGE])->group(function () {
+    Route::middleware(['subscription.active', 'permission:' . RolePermissions::ORDERS_UPDATE_PAYMENT])->group(function () {
         Route::patch('/orders/{order}/payment', [OrderController::class, 'updatePayment']);
     });
 
-    Route::middleware(['subscription.active', 'permission:'.RolePermissions::WAITER_CALLS_MANAGE])->group(function () {
+    Route::middleware(['subscription.active', 'permission:' . RolePermissions::WAITER_CALLS_MANAGE])->group(function () {
         Route::get('/waiter-calls', [WaiterCallController::class, 'index']);
         Route::patch('/waiter-calls/{waiterCall}/status', [WaiterCallController::class, 'updateStatus']);
     });
 
     Route::prefix('admin')->middleware('subscription.active')->group(function () {
-        Route::middleware('permission:'.RolePermissions::MENU_MANAGE)->group(function () {
+        Route::middleware('permission:' . RolePermissions::MENU_MANAGE)->group(function () {
             Route::apiResource('categories', AdminCategoryController::class);
             Route::apiResource('tags', AdminTagController::class);
             Route::apiResource('products', AdminProductController::class);
@@ -141,21 +142,21 @@ Route::middleware(['auth:sanctum', 'tenant.user', 'verified', 'throttle:120,1'])
             Route::delete('products/{product}/image', [AdminProductController::class, 'deleteImage']);
         });
 
-        Route::middleware('permission:'.RolePermissions::QR_MANAGE)->group(function () {
+        Route::middleware('permission:' . RolePermissions::QR_MANAGE)->group(function () {
             Route::apiResource('locations', AdminLocationController::class);
             Route::post('locations/{location}/regenerate-qr', [AdminLocationController::class, 'regenerateQr']);
         });
 
-        Route::middleware('permission:'.RolePermissions::USERS_MANAGE)->group(function () {
+        Route::middleware('permission:' . RolePermissions::USERS_MANAGE)->group(function () {
             Route::apiResource('users', AdminUserController::class)->except(['show']);
         });
 
-        Route::middleware('permission:'.RolePermissions::ORDERS_MANAGE)->group(function () {
+        Route::middleware('permission:' . RolePermissions::ORDERS_MANAGE)->group(function () {
             Route::get('reports/sales', [ReportController::class, 'sales']);
             Route::get('reports/products', [ReportController::class, 'products']);
         });
 
-        Route::middleware('permission:'.RolePermissions::SETTINGS_MANAGE)->group(function () {
+        Route::middleware('permission:' . RolePermissions::SETTINGS_MANAGE)->group(function () {
             Route::get('reports/summary', [ReportController::class, 'summary']);
             Route::get('settings', [TenantSettingsController::class, 'show']);
             Route::put('settings', [TenantSettingsController::class, 'update']);
@@ -185,7 +186,7 @@ Route::middleware(['auth:sanctum', 'tenant.user', 'verified', 'throttle:120,1'])
         });
     });
 
-    Route::prefix('platform')->middleware('permission:'.RolePermissions::TENANTS_MANAGE)->group(function () {
+    Route::prefix('platform')->middleware('permission:' . RolePermissions::TENANTS_MANAGE)->group(function () {
         Route::get('overview', PlatformOverviewController::class);
         Route::apiResource('tenants', TenantController::class);
     });

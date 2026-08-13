@@ -29,14 +29,15 @@ class RolePermissionsTest extends TestCase
         $this->activateTenantSubscription($this->tenant);
     }
 
-    private function createUser(string $role): User
+    private function createUser(string $role, ?string $staffPosition = null): User
     {
         $user = User::query()->create([
             'tenant_id' => $this->tenant->id,
             'name' => ucfirst($role),
-            'email' => "{$role}@test.com",
+            'email' => "{$role}-{$staffPosition}-".uniqid('', true).'@test.com',
             'password' => 'password123',
             'role' => $role,
+            'staff_position' => $role === User::ROLE_STAFF ? $staffPosition : null,
             'is_active' => true,
         ]);
         $user->markEmailAsVerified();
@@ -69,20 +70,47 @@ class RolePermissionsTest extends TestCase
         $this->assertNotContains(RolePermissions::WAITER_CALLS_MANAGE, $permissions);
     }
 
-    public function test_staff_can_only_view_and_update_orders_and_waiter_calls(): void
+    public function test_kitchen_staff_can_only_view_and_update_kitchen_orders(): void
     {
-        $permissions = RolePermissions::forUser($this->createUser(User::ROLE_STAFF));
+        $permissions = RolePermissions::forUser(
+            $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_KITCHEN)
+        );
 
         $this->assertSame([
             RolePermissions::ORDERS_VIEW,
             RolePermissions::ORDERS_UPDATE_STATUS,
+        ], $permissions);
+    }
+
+    public function test_bar_staff_can_only_view_and_update_bar_orders(): void
+    {
+        $permissions = RolePermissions::forUser(
+            $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_BAR)
+        );
+
+        $this->assertSame([
+            RolePermissions::ORDERS_VIEW,
+            RolePermissions::ORDERS_UPDATE_STATUS,
+        ], $permissions);
+    }
+
+    public function test_waiter_staff_can_manage_waiter_board_and_payments(): void
+    {
+        $permissions = RolePermissions::forUser(
+            $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_WAITER)
+        );
+
+        $this->assertSame([
+            RolePermissions::ORDERS_VIEW,
+            RolePermissions::ORDERS_UPDATE_STATUS,
+            RolePermissions::ORDERS_UPDATE_PAYMENT,
             RolePermissions::WAITER_CALLS_MANAGE,
         ], $permissions);
     }
 
     public function test_staff_is_blocked_from_admin_endpoints(): void
     {
-        $token = $this->createUser(User::ROLE_STAFF)->issueStaffToken();
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_KITCHEN)->issueStaffToken();
 
         $this->withToken($token)
             ->withHeader('X-Tenant', 'test-beach')
@@ -97,6 +125,36 @@ class RolePermissionsTest extends TestCase
         $this->withToken($token)
             ->withHeader('X-Tenant', 'test-beach')
             ->getJson('/api/admin/settings')
+            ->assertForbidden();
+    }
+
+    public function test_kitchen_staff_cannot_query_bar_station(): void
+    {
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_KITCHEN)->issueStaffToken();
+
+        $this->withToken($token)
+            ->withHeader('X-Tenant', 'test-beach')
+            ->getJson('/api/orders?station=bar')
+            ->assertForbidden();
+    }
+
+    public function test_bar_staff_cannot_query_kitchen_station(): void
+    {
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_BAR)->issueStaffToken();
+
+        $this->withToken($token)
+            ->withHeader('X-Tenant', 'test-beach')
+            ->getJson('/api/orders?station=kitchen')
+            ->assertForbidden();
+    }
+
+    public function test_waiter_staff_cannot_query_station_boards(): void
+    {
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_WAITER)->issueStaffToken();
+
+        $this->withToken($token)
+            ->withHeader('X-Tenant', 'test-beach')
+            ->getJson('/api/orders?station=kitchen')
             ->assertForbidden();
     }
 
@@ -120,7 +178,7 @@ class RolePermissionsTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_staff_cannot_update_payment(): void
+    public function test_waiter_staff_can_mark_pay_at_location_paid(): void
     {
         $location = Location::query()->create([
             'tenant_id' => $this->tenant->id,
@@ -144,7 +202,40 @@ class RolePermissionsTest extends TestCase
             'payment_status' => 'unpaid',
         ]);
 
-        $token = $this->createUser(User::ROLE_STAFF)->issueStaffToken();
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_WAITER)->issueStaffToken();
+
+        $this->withToken($token)
+            ->withHeader('X-Tenant', 'test-beach')
+            ->patchJson("/api/orders/{$order->id}/payment", ['payment_status' => 'paid'])
+            ->assertOk()
+            ->assertJsonPath('payment_status', 'paid');
+    }
+
+    public function test_kitchen_staff_cannot_mark_pay_at_location_paid(): void
+    {
+        $location = Location::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Table 1B',
+            'slug' => 'table-1b',
+            'type' => 'table',
+            'code' => 'table1b',
+            'capacity' => 4,
+            'is_active' => true,
+        ]);
+
+        $order = Order::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'location_id' => $location->id,
+            'order_number' => 'BO-TEST-PAY-KITCHEN',
+            'status' => 'delivered',
+            'customer_session' => '00000000-0000-4000-8000-000000000011',
+            'subtotal' => 10,
+            'total' => 10,
+            'payment_method' => 'pay_at_location',
+            'payment_status' => 'unpaid',
+        ]);
+
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_KITCHEN)->issueStaffToken();
 
         $this->withToken($token)
             ->withHeader('X-Tenant', 'test-beach')
@@ -152,14 +243,48 @@ class RolePermissionsTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_me_includes_permissions(): void
+    public function test_waiter_staff_cannot_mark_online_payment_paid(): void
     {
-        $token = $this->createUser(User::ROLE_MANAGER)->issueStaffToken();
+        $location = Location::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Table 2',
+            'slug' => 'table-2',
+            'type' => 'table',
+            'code' => 'table2',
+            'capacity' => 4,
+            'is_active' => true,
+        ]);
+
+        $order = Order::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'location_id' => $location->id,
+            'order_number' => 'BO-TEST-ONLINE',
+            'status' => 'delivered',
+            'customer_session' => '00000000-0000-4000-8000-000000000002',
+            'subtotal' => 10,
+            'total' => 10,
+            'payment_method' => 'card_online',
+            'payment_status' => 'pending',
+        ]);
+
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_WAITER)->issueStaffToken();
+
+        $this->withToken($token)
+            ->withHeader('X-Tenant', 'test-beach')
+            ->patchJson("/api/orders/{$order->id}/payment", ['payment_status' => 'paid'])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Online order payments must be confirmed by the payment provider.');
+    }
+
+    public function test_me_includes_permissions_and_staff_position(): void
+    {
+        $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_BAR)->issueStaffToken();
 
         $this->withToken($token)
             ->getJson('/api/me')
             ->assertOk()
-            ->assertJsonPath('role', User::ROLE_MANAGER)
+            ->assertJsonPath('role', User::ROLE_STAFF)
+            ->assertJsonPath('staff_position', User::STAFF_POSITION_BAR)
             ->assertJsonStructure(['permissions']);
     }
 }

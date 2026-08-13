@@ -12,15 +12,36 @@ window.Pusher = Pusher
 
 let echoInstance: Echo<'reverb'> | null = null
 
+function reverbTransport() {
+  // Route WebSocket through Vite (/app → Reverb) so LAN and DevTunnel work.
+  const useProxy = import.meta.env.VITE_REVERB_USE_PROXY !== 'false'
+  if (useProxy && typeof window !== 'undefined') {
+    const port = window.location.port
+      ? Number(window.location.port)
+      : window.location.protocol === 'https:' ? 443 : 80
+
+    return {
+      wsHost: window.location.hostname,
+      wsPort: port,
+      wssPort: port,
+      forceTLS: window.location.protocol === 'https:',
+    }
+  }
+
+  return {
+    wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
+    wsPort: Number(import.meta.env.VITE_REVERB_PORT || 8080),
+    wssPort: Number(import.meta.env.VITE_REVERB_PORT || 8080),
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
+  }
+}
+
 export function getEcho(): Echo<'reverb'> {
   if (!echoInstance) {
     echoInstance = new Echo({
       broadcaster: 'reverb',
       key: import.meta.env.VITE_REVERB_APP_KEY,
-      wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
-      wsPort: Number(import.meta.env.VITE_REVERB_PORT || 8080),
-      wssPort: Number(import.meta.env.VITE_REVERB_PORT || 8080),
-      forceTLS: (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
+      ...reverbTransport(),
       enabledTransports: ['ws', 'wss'],
       authEndpoint: `${import.meta.env.VITE_API_URL || '/api'}/broadcasting/auth`,
       auth: {

@@ -170,7 +170,12 @@ class Order extends Model
             return true;
         }
 
-        return $user->isStaffRole();
+        if ($user->isStaffRole()) {
+            return in_array($user->staffPosition(), ['kitchen', 'bar'], true)
+                && $user->staffPosition() === $station;
+        }
+
+        return false;
     }
 
     public function canRoleTransitionTo(User $user, string $status): bool
@@ -188,15 +193,16 @@ class Order extends Model
         }
 
         if ($user->isStaffRole()) {
-            return in_array($status, [
-                'accepted',
-                'preparing',
-                'ready',
-                'delivering',
-                'delivered',
-                'cancelled',
-                ...self::STATION_STATUSES,
-            ], true);
+            if ($user->hasStaffPosition(User::STAFF_POSITION_WAITER)) {
+                return in_array($status, [
+                    'ready',
+                    'delivering',
+                    'delivered',
+                    'cancelled',
+                ], true);
+            }
+
+            return false;
         }
 
         return false;

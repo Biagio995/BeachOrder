@@ -7,14 +7,21 @@ import AdminPageHeader from '@/components/admin/AdminPageHeader.vue'
 import { useAdminDialog } from '@/composables/useAdminDialog'
 import { useDeleteConfirm } from '@/composables/useDeleteConfirm'
 import { useUiStore } from '@/stores/ui'
-import { ASSIGNABLE_ROLES, ROLE_LABELS } from '@/utils/permissions'
+import {
+  ASSIGNABLE_USER_ROLES,
+  ASSIGNABLE_USER_ROLE_LABELS,
+  payloadFromUserRolePicker,
+  userRoleLabel,
+  userRolePickerValue,
+  type AssignableUserRole,
+} from '@/utils/staffPosition'
 
 type UserForm = {
   id: number | null
   name: string
   email: string
   password: string
-  role: string
+  selectedRole: AssignableUserRole
   is_active: boolean
 }
 
@@ -28,7 +35,7 @@ const emptyForm = (): UserForm => ({
   name: '',
   email: '',
   password: '',
-  role: 'staff',
+  selectedRole: 'kitchen',
   is_active: true,
 })
 
@@ -48,8 +55,8 @@ const {
 })
 
 const roleOptions = computed(() =>
-  ASSIGNABLE_ROLES.map((role) => ({
-    title: ROLE_LABELS[role],
+  ASSIGNABLE_USER_ROLES.map((role) => ({
+    title: ASSIGNABLE_USER_ROLE_LABELS[role],
     value: role,
   })),
 )
@@ -72,7 +79,7 @@ function edit(user: any) {
     name: user.name || '',
     email: user.email || '',
     password: '',
-    role: user.role || 'staff',
+    selectedRole: userRolePickerValue(user),
     is_active: user.is_active ?? true,
   })
 }
@@ -80,10 +87,12 @@ function edit(user: any) {
 async function save() {
   if (!canSave.value) return
   await withSaving(async () => {
+    const rolePayload = payloadFromUserRolePicker(form.value.selectedRole)
     const payload: Record<string, unknown> = {
       name: form.value.name,
       email: form.value.email,
-      role: form.value.role,
+      role: rolePayload.role,
+      staff_position: rolePayload.staff_position,
       is_active: form.value.is_active,
     }
     if (form.value.password) {
@@ -123,7 +132,7 @@ onMounted(load)
       <div class="min-w-0">
         <strong>{{ user.name }}</strong>
         <div class="text-medium-emphasis text-body-2">
-          {{ user.email }} · {{ ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role }}
+          {{ user.email }} · {{ userRoleLabel(user) }}
           <span v-if="!user.is_active"> · inactive</span>
         </div>
       </div>
@@ -159,7 +168,13 @@ onMounted(load)
           />
         </v-col>
         <v-col cols="12" md="6">
-          <v-select v-model="form.role" :items="roleOptions" item-title="title" item-value="value" label="Role" />
+          <v-select
+            v-model="form.selectedRole"
+            :items="roleOptions"
+            item-title="title"
+            item-value="value"
+            label="Ruolo"
+          />
         </v-col>
         <v-col cols="12" class="d-flex align-center">
           <v-switch v-model="form.is_active" :label="t('admin.active')" color="primary" hide-details />

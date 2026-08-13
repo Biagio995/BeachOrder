@@ -310,6 +310,7 @@ export interface User {
   name: string
   email: string
   role: 'super_admin' | 'admin' | 'manager' | 'staff'
+  staff_position?: 'kitchen' | 'bar' | 'waiter' | null
   permissions?: import('@/utils/permissions').Permission[]
   is_active: boolean
   email_verified_at?: string | null

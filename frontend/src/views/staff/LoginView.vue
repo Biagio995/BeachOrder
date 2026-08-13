@@ -27,7 +27,7 @@ const error = ref('')
 
 onMounted(() => {
   if (auth.isAuthenticated) {
-    router.replace(homePathForRole(auth.user?.role))
+    router.replace(homePathForRole(auth.user?.role, auth.user?.staff_position))
   }
 })
 
@@ -37,7 +37,7 @@ async function submit() {
   try {
     resetEcho()
     await auth.login(email.value, password.value, tenant.value || undefined)
-    const redirect = (route.query.redirect as string) || homePathForRole(auth.user?.role)
+    const redirect = (route.query.redirect as string) || homePathForRole(auth.user?.role, auth.user?.staff_position)
     router.push(redirect)
   } catch (e) {
     error.value = getApiErrorMessage(e, t('common.error'))

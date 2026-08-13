@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js'
+import { loadStripe, type Stripe, type StripeElements, type StripePaymentElement } from '@stripe/stripe-js'
 import api, { getApiErrorMessage, tenantPath } from '@/api/client'
 import { useMenuStore } from '@/stores/menu'
 import { useUiStore } from '@/stores/ui'
 import ServiceUnavailable from '@/components/customer/ServiceUnavailable.vue'
 import { formatMoney } from '@/utils/money'
+import { stripeLocaleFromApp } from '@/utils/stripeLocale'
+import { waitForOrderPayment } from '@/utils/waitForOrderPayment'
+import { useActiveOrderStore } from '@/stores/activeOrder'
 
 interface PaymentSession {
   client_secret: string
@@ -23,6 +26,7 @@ const router = useRouter()
 const { t, locale } = useI18n()
 const menu = useMenuStore()
 const ui = useUiStore()
+const activeOrder = useActiveOrderStore()
 
 const loading = ref(true)
 const paying = ref(false)
@@ -30,11 +34,13 @@ const error = ref('')
 const payment = ref<PaymentSession | null>(null)
 const stripe = ref<Stripe | null>(null)
 const elements = ref<StripeElements | null>(null)
+let paymentElement: StripePaymentElement | null = null
 
 const tenant = computed(() => String(route.params.tenant || menu.tenantSlug))
 const orderId = computed(() => String(route.params.id))
 const session = computed(() => String(route.query.session || menu.session))
 const currency = computed(() => payment.value?.currency || menu.tenant?.currency || 'EUR')
+const stripeLocale = computed(() => stripeLocaleFromApp(String(locale.value)))
 
 async function loadPaymentSession() {
   loading.value = true
@@ -54,14 +60,21 @@ async function loadPaymentSession() {
 async function mountStripeElement() {
   if (!payment.value?.client_secret || !payment.value.publishable_key) return
 
-  stripe.value = await loadStripe(payment.value.publishable_key)
+  if (!stripe.value) {
+    stripe.value = await loadStripe(payment.value.publishable_key)
+  }
   if (!stripe.value) {
     error.value = t('payment.stripeUnavailable')
     return
   }
 
+  paymentElement?.unmount()
+  paymentElement = null
+  elements.value = null
+
   elements.value = stripe.value.elements({
     clientSecret: payment.value.client_secret,
+    locale: stripeLocale.value,
     appearance: {
       theme: 'stripe',
       variables: {
@@ -71,7 +84,7 @@ async function mountStripeElement() {
     },
   })
 
-  const paymentElement = elements.value.create('payment')
+  paymentElement = elements.value.create('payment')
   paymentElement.mount('#payment-element')
 }
 
@@ -94,6 +107,14 @@ async function confirmPayment() {
   if (stripeError) {
     error.value = stripeError.message || t('payment.failed')
     return
+  }
+
+  paying.value = true
+  const confirmed = await waitForOrderPayment(tenant.value, orderId.value, session.value)
+  paying.value = false
+
+  if (confirmed) {
+    activeOrder.track(confirmed, tenant.value, session.value)
   }
 
   ui.success(t('payment.success'))
@@ -125,7 +146,15 @@ onMounted(async () => {
   await mountStripeElement()
 })
 
+watch(stripeLocale, () => {
+  if (payment.value?.payment_status !== 'paid' && !loading.value) {
+    void mountStripeElement()
+  }
+})
+
 onBeforeUnmount(() => {
+  paymentElement?.unmount()
+  paymentElement = null
   elements.value = null
   stripe.value = null
 })

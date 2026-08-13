@@ -25,7 +25,11 @@ class OrderFlowTest extends TestCase
 
     private Product $product;
 
-    private User $staff;
+    private User $barStaff;
+
+    private User $kitchenStaff;
+
+    private User $waiterStaff;
 
     protected function setUp(): void
     {
@@ -78,15 +82,38 @@ class OrderFlowTest extends TestCase
             'low_stock_threshold' => 2,
         ]);
 
-        $this->staff = User::query()->create([
+        $this->barStaff = User::query()->create([
             'tenant_id' => $this->tenant->id,
-            'name' => 'Staff',
-            'email' => 'staff@test.beach',
+            'name' => 'Bar Staff',
+            'email' => 'bar@test.beach',
             'password' => Hash::make('password'),
             'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_BAR,
             'is_active' => true,
         ]);
-        $this->staff->markEmailAsVerified();
+        $this->barStaff->markEmailAsVerified();
+
+        $this->kitchenStaff = User::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Kitchen Staff',
+            'email' => 'kitchen@test.beach',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_KITCHEN,
+            'is_active' => true,
+        ]);
+        $this->kitchenStaff->markEmailAsVerified();
+
+        $this->waiterStaff = User::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Waiter Staff',
+            'email' => 'waiter@test.beach',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_WAITER,
+            'is_active' => true,
+        ]);
+        $this->waiterStaff->markEmailAsVerified();
 
         TenantContext::clear();
 
@@ -150,7 +177,7 @@ class OrderFlowTest extends TestCase
             ],
         ])->json('id');
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->waiterStaff);
 
         $this->withHeader('X-Tenant', 'test-beach')
             ->patchJson("/api/orders/{$orderId}/status", ['status' => 'cancelled'])
@@ -172,12 +199,12 @@ class OrderFlowTest extends TestCase
             ],
         ])->json('id');
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->waiterStaff);
         $this->withHeader('X-Tenant', 'test-beach')
             ->patchJson("/api/orders/{$orderId}/status", ['status' => 'accepted'])
             ->assertStatus(422);
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->barStaff);
         $this->withHeader('X-Tenant', 'test-beach')
             ->patchJson("/api/orders/{$orderId}/status", ['status' => 'accepted', 'station' => 'bar'])
             ->assertOk();
@@ -192,7 +219,7 @@ class OrderFlowTest extends TestCase
             ->assertJsonPath('status', 'ready')
             ->assertJsonPath('bar_status', 'ready');
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->waiterStaff);
         $this->withHeader('X-Tenant', 'test-beach')
             ->patchJson("/api/orders/{$orderId}/status", ['status' => 'delivering'])
             ->assertOk();
@@ -218,15 +245,6 @@ class OrderFlowTest extends TestCase
             'is_active' => true,
             'sort_order' => 1,
         ]);
-        $cook = User::query()->create([
-            'tenant_id' => $this->tenant->id,
-            'name' => 'Cook',
-            'email' => 'cook@test.beach',
-            'password' => Hash::make('password'),
-            'role' => User::ROLE_STAFF,
-            'is_active' => true,
-        ]);
-        $cook->markEmailAsVerified();
         TenantContext::clear();
 
         $access = $this->claimAccess();
@@ -243,7 +261,7 @@ class OrderFlowTest extends TestCase
             ->assertJsonPath('bar_status', 'received')
             ->json('id');
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->barStaff);
         foreach (['accepted', 'preparing', 'ready'] as $status) {
             $this->withHeader('X-Tenant', 'test-beach')
                 ->patchJson("/api/orders/{$orderId}/status", ['status' => $status, 'station' => 'bar'])
@@ -256,7 +274,7 @@ class OrderFlowTest extends TestCase
             ->assertJsonPath('bar_status', 'ready')
             ->assertJsonPath('kitchen_status', 'received');
 
-        Sanctum::actingAs($cook);
+        Sanctum::actingAs($this->kitchenStaff);
         foreach (['accepted', 'preparing', 'ready'] as $status) {
             $this->withHeader('X-Tenant', 'test-beach')
                 ->patchJson("/api/orders/{$orderId}/status", ['status' => $status, 'station' => 'kitchen'])
@@ -286,15 +304,6 @@ class OrderFlowTest extends TestCase
             'is_active' => true,
             'sort_order' => 1,
         ]);
-        $cook = User::query()->create([
-            'tenant_id' => $this->tenant->id,
-            'name' => 'Cook2',
-            'email' => 'cook2@test.beach',
-            'password' => Hash::make('password'),
-            'role' => User::ROLE_STAFF,
-            'is_active' => true,
-        ]);
-        $cook->markEmailAsVerified();
         TenantContext::clear();
 
         $access = $this->claimAccess();
@@ -308,7 +317,7 @@ class OrderFlowTest extends TestCase
             ],
         ])->assertCreated();
 
-        Sanctum::actingAs($cook);
+        Sanctum::actingAs($this->kitchenStaff);
         $kitchenItems = $this->withHeader('X-Tenant', 'test-beach')
             ->getJson('/api/orders?station=kitchen&status=received')
             ->assertOk()
@@ -316,7 +325,7 @@ class OrderFlowTest extends TestCase
         $this->assertCount(1, $kitchenItems);
         $this->assertSame('kitchen', $kitchenItems[0]['station']);
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->barStaff);
         $barItems = $this->withHeader('X-Tenant', 'test-beach')
             ->getJson('/api/orders?station=bar&status=received')
             ->assertOk()
@@ -355,7 +364,7 @@ class OrderFlowTest extends TestCase
 
         TenantContext::clear();
 
-        Sanctum::actingAs($this->staff);
+        Sanctum::actingAs($this->waiterStaff);
         $waiterIds = $this->withHeader('X-Tenant', 'test-beach')
             ->getJson('/api/orders?status=ready,delivering')
             ->assertOk()

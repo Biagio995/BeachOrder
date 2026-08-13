@@ -88,6 +88,7 @@ class OnlinePaymentTest extends TestCase
             'email' => 'staff@pay.beach',
             'password' => Hash::make('password'),
             'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_BAR,
             'is_active' => true,
         ]);
         $this->staff->markEmailAsVerified();
@@ -111,6 +112,9 @@ class OnlinePaymentTest extends TestCase
     {
         $this->mock(StripeOrderPaymentService::class, function (MockInterface $mock) {
             $mock->shouldReceive('isConfigured')->andReturn(true);
+            $mock->shouldReceive('syncPaymentStatus')->andReturnUsing(function (Order $order) {
+                return $order->payment_status === 'paid';
+            });
             $mock->shouldReceive('createOrRefreshPaymentIntent')->andReturnUsing(function (Order $order) {
                 $order->stripe_payment_intent_id = 'pi_test_'.Str::random(8);
                 $order->payment_status = 'pending';
@@ -389,5 +393,45 @@ class OnlinePaymentTest extends TestCase
             ->assertOk()
             ->assertJsonPath('payment_status', 'pending')
             ->assertJsonStructure(['client_secret', 'publishable_key', 'payment_intent_id']);
+    }
+
+    public function test_customer_order_show_syncs_succeeded_stripe_payment(): void
+    {
+        $session = (string) Str::uuid();
+
+        $order = $this->createOrder([
+            'order_number' => 'BO-TEST-SYNC',
+            'customer_session' => $session,
+            'payment_method' => 'card_online',
+            'payment_status' => 'pending',
+            'stripe_payment_intent_id' => 'pi_test_sync',
+        ]);
+
+        $this->partialMock(StripeOrderPaymentService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('isConfigured')->andReturn(true);
+            $mock->shouldReceive('syncPaymentStatus')->andReturnUsing(function (Order $order) {
+                $order->payment_status = 'paid';
+                $order->paid_at = now();
+                $order->payment_reference = 'BO-PAY-SYNC123';
+                $order->save();
+
+                return true;
+            });
+            $mock->shouldReceive('receiptFor')->andReturnUsing(function (Order $order) {
+                return [
+                    'reference' => $order->payment_reference,
+                    'stripe_payment_intent_id' => $order->stripe_payment_intent_id,
+                    'paid_at' => $order->paid_at?->toIso8601String(),
+                    'amount' => (float) $order->total,
+                    'currency' => 'EUR',
+                    'method' => $order->payment_method,
+                ];
+            });
+        });
+
+        $this->getJson("/api/t/pay-beach/orders/{$order->id}?session={$session}")
+            ->assertOk()
+            ->assertJsonPath('payment_status', 'paid')
+            ->assertJsonPath('payment_receipt.reference', 'BO-PAY-SYNC123');
     }
 }

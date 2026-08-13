@@ -18,6 +18,8 @@ class RolePermissions
 
     public const ORDERS_UPDATE_STATUS = 'orders.update_status';
 
+    public const ORDERS_UPDATE_PAYMENT = 'orders.update_payment';
+
     public const QR_MANAGE = 'qr.manage';
 
     public const SETTINGS_MANAGE = 'settings.manage';
@@ -34,6 +36,7 @@ class RolePermissions
         self::ORDERS_MANAGE,
         self::ORDERS_VIEW,
         self::ORDERS_UPDATE_STATUS,
+        self::ORDERS_UPDATE_PAYMENT,
         self::QR_MANAGE,
         self::SETTINGS_MANAGE,
         self::PRODUCTS_AVAILABILITY,
@@ -49,6 +52,7 @@ class RolePermissions
             self::ORDERS_MANAGE,
             self::ORDERS_VIEW,
             self::ORDERS_UPDATE_STATUS,
+            self::ORDERS_UPDATE_PAYMENT,
             self::QR_MANAGE,
             self::SETTINGS_MANAGE,
             self::PRODUCTS_AVAILABILITY,
@@ -59,26 +63,45 @@ class RolePermissions
             self::ORDERS_MANAGE,
             self::ORDERS_VIEW,
             self::ORDERS_UPDATE_STATUS,
+            self::ORDERS_UPDATE_PAYMENT,
             self::QR_MANAGE,
             self::PRODUCTS_AVAILABILITY,
         ],
-        User::ROLE_STAFF => [
+        User::ROLE_STAFF => [],
+    ];
+
+    /** @var array<string, list<string>> */
+    private const STAFF_POSITION_MAP = [
+        User::STAFF_POSITION_KITCHEN => [
             self::ORDERS_VIEW,
             self::ORDERS_UPDATE_STATUS,
+        ],
+        User::STAFF_POSITION_BAR => [
+            self::ORDERS_VIEW,
+            self::ORDERS_UPDATE_STATUS,
+        ],
+        User::STAFF_POSITION_WAITER => [
+            self::ORDERS_VIEW,
+            self::ORDERS_UPDATE_STATUS,
+            self::ORDERS_UPDATE_PAYMENT,
             self::WAITER_CALLS_MANAGE,
         ],
     ];
 
     /** @return list<string> */
-    public static function forRole(?string $role): array
+    public static function forRole(?string $role, ?string $staffPosition = null): array
     {
+        if ($role === User::ROLE_STAFF) {
+            return self::STAFF_POSITION_MAP[$staffPosition] ?? [];
+        }
+
         return self::MAP[$role] ?? [];
     }
 
     /** @return list<string> */
     public static function forUser(User $user): array
     {
-        return self::forRole($user->role);
+        return self::forRole($user->role, $user->staff_position);
     }
 
     public static function userHas(User $user, string $permission): bool
@@ -96,5 +119,11 @@ class RolePermissions
     public static function assignableRoles(): array
     {
         return self::tenantRoles();
+    }
+
+    /** @return list<string> */
+    public static function staffPositions(): array
+    {
+        return User::STAFF_POSITIONS;
     }
 }

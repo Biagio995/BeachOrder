@@ -27,6 +27,21 @@ class OrderPaymentController extends Controller
             return response()->json(['message' => 'Online payments are not configured'], 503);
         }
 
+        $this->stripePayments->syncPaymentStatus($order);
+        $order->refresh();
+
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'order_id' => $order->id,
+                'payment_status' => 'paid',
+                'amount' => (float) $order->total,
+                'currency' => strtoupper($order->tenant?->currency ?? 'EUR'),
+                'payment_intent_id' => $order->stripe_payment_intent_id,
+                'publishable_key' => (string) config('billing.stripe.key'),
+                'client_secret' => null,
+            ]);
+        }
+
         $payload = $this->stripePayments->createOrRefreshPaymentIntent($order);
 
         return response()->json([

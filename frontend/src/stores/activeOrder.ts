@@ -52,7 +52,26 @@ function writeStored(ref: ActiveOrderRef | null) {
 export const useActiveOrderStore = defineStore('activeOrder', () => {
   const current = ref<ActiveOrderRef | null>(null)
   let echoChannel: string | null = null
-  let pollTimer: ReturnType<typeof setInterval> | null = null
+  let pollTimer: ReturnType<typeof setTimeout> | null = null
+
+  function pollDelayMs() {
+    if (current.value?.paymentStatus === 'pending') return 1500
+    return 20000
+  }
+
+  function schedulePoll() {
+    if (pollTimer) {
+      clearTimeout(pollTimer)
+      pollTimer = null
+    }
+    if (!current.value) return
+
+    pollTimer = setTimeout(async () => {
+      if (!current.value) return
+      await refresh()
+      schedulePoll()
+    }, pollDelayMs())
+  }
 
   const isActive = computed(() => !!current.value && !isTerminal(current.value.status))
 
@@ -125,7 +144,7 @@ export const useActiveOrderStore = defineStore('activeOrder', () => {
 
   function stopWatching() {
     if (pollTimer) {
-      clearInterval(pollTimer)
+      clearTimeout(pollTimer)
       pollTimer = null
     }
     if (echoChannel) {
@@ -160,9 +179,7 @@ export const useActiveOrderStore = defineStore('activeOrder', () => {
       }
     }
 
-    pollTimer = setInterval(() => {
-      if (current.value) void refresh()
-    }, 20000)
+    schedulePoll()
   }
 
   return {

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { homePathForRole } from '@/utils/roleHome'
 import { hasAnyPermission, PERMISSIONS, type Permission } from '@/utils/permissions'
+import { staffCanAccessRoute, type StaffPosition } from '@/utils/staffPosition'
 
 const demoTenant = import.meta.env.VITE_DEMO_TENANT || 'azure-beach'
 
@@ -103,6 +104,7 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         permissions: [PERMISSIONS.ORDERS_VIEW],
+        staffPosition: 'kitchen' as StaffPosition,
         station: 'kitchen',
       },
     },
@@ -113,6 +115,7 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         permissions: [PERMISSIONS.ORDERS_VIEW],
+        staffPosition: 'bar' as StaffPosition,
         station: 'bar',
       },
     },
@@ -123,6 +126,7 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         permissions: [PERMISSIONS.WAITER_CALLS_MANAGE],
+        staffPosition: 'waiter' as StaffPosition,
       },
     },
     {
@@ -258,8 +262,8 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
-function homeForRole(role?: string) {
-  return homePathForRole(role)
+function homeForRole(role?: string, staffPosition?: string | null) {
+  return homePathForRole(role, staffPosition)
 }
 
 function requiredPermissionsForRoute(to: { matched: { meta: { permissions?: Permission[] } }[] }): Permission[] | undefined {
@@ -302,11 +306,11 @@ router.beforeEach(async (to) => {
     if (!auth.isEmailVerified) {
       return { name: 'verify-email' }
     }
-    return homeForRole(auth.user?.role)
+    return homeForRole(auth.user?.role, auth.user?.staff_position)
   }
 
   if (to.name === 'register' && auth.isAuthenticated && auth.isEmailVerified) {
-    return homeForRole(auth.user?.role)
+    return homeForRole(auth.user?.role, auth.user?.staff_position)
   }
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
@@ -325,8 +329,21 @@ router.beforeEach(async (to) => {
   const required = requiredPermissionsForRoute(to)
   if (required && auth.user) {
     if (!hasAnyPermission(auth.permissions, required, auth.user.role)) {
-      return homeForRole(auth.user.role)
+      return homeForRole(auth.user.role, auth.user.staff_position)
     }
+  }
+
+  const requiredStaffPosition = [...to.matched]
+    .reverse()
+    .map((record) => record.meta.staffPosition as StaffPosition | undefined)
+    .find(Boolean)
+
+  if (
+    requiredStaffPosition &&
+    auth.user?.role === 'staff' &&
+    !staffCanAccessRoute(auth.user.staff_position, requiredStaffPosition)
+  ) {
+    return homeForRole(auth.user.role, auth.user.staff_position)
   }
 
   if (

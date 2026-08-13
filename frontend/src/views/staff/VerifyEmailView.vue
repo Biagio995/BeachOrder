@@ -74,7 +74,7 @@ async function resend() {
 }
 
 function continueToApp() {
-  router.push(homePathForRole(auth.user?.role))
+  router.push(homePathForRole(auth.user?.role, auth.user?.staff_position))
 }
 
 async function goToLogin() {

@@ -27,6 +27,19 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
 
     public const ROLE_STAFF = 'staff';
 
+    public const STAFF_POSITION_KITCHEN = 'kitchen';
+
+    public const STAFF_POSITION_BAR = 'bar';
+
+    public const STAFF_POSITION_WAITER = 'waiter';
+
+    /** @var list<string> */
+    public const STAFF_POSITIONS = [
+        self::STAFF_POSITION_KITCHEN,
+        self::STAFF_POSITION_BAR,
+        self::STAFF_POSITION_WAITER,
+    ];
+
     public const STAFF_TOKEN_NAME = 'staff';
 
     protected $fillable = [
@@ -35,6 +48,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
         'email',
         'password',
         'role',
+        'staff_position',
         'is_active',
         'location_id',
         'terms_accepted_at',
@@ -83,6 +97,16 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
     public function isStaffRole(): bool
     {
         return $this->role === self::ROLE_STAFF;
+    }
+
+    public function staffPosition(): ?string
+    {
+        return $this->isStaffRole() ? $this->staff_position : null;
+    }
+
+    public function hasStaffPosition(string $position): bool
+    {
+        return $this->staffPosition() === $position;
     }
 
     public function isStaff(): bool

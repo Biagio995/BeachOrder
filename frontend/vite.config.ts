@@ -51,6 +51,15 @@ function stubVuetifyComponentCss(): Plugin {
   }
 }
 
+/** Reverb WebSocket (Pusher protocol) — proxied so DevTunnel/LAN use the same origin as Vite. */
+const reverbProxy = {
+  '/app': {
+    target: 'http://127.0.0.1:8080',
+    changeOrigin: true,
+    ws: true,
+  },
+}
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -115,6 +124,7 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
+      ...reverbProxy,
     },
   },
   // DevTunnel / remote: use `npm run dev:tunnel` (build + preview).
@@ -132,6 +142,7 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
+      ...reverbProxy,
     },
   },
 })

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use App\Support\TenantContext;
 use App\Support\RolePermissions;
+use App\Support\TenantRules;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -31,9 +32,18 @@ class UserController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', Password::defaults()],
             'role' => ['required', Rule::in(RolePermissions::assignableRoles())],
+            'staff_position' => [
+                Rule::requiredIf(fn () => $request->input('role') === User::ROLE_STAFF),
+                'nullable',
+                Rule::in(User::STAFF_POSITIONS),
+            ],
             'is_active' => ['nullable', 'boolean'],
             'location_id' => ['nullable', TenantRules::exists('locations')],
         ]);
+
+        if (($data['role'] ?? null) !== User::ROLE_STAFF) {
+            $data['staff_position'] = null;
+        }
 
         $data['tenant_id'] = TenantContext::id();
         $user = User::create($data);
@@ -52,9 +62,19 @@ class UserController extends Controller
             'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', Password::defaults()],
             'role' => ['sometimes', Rule::in(RolePermissions::assignableRoles())],
+            'staff_position' => [
+                Rule::requiredIf(fn () => ($request->input('role') ?? $user->role) === User::ROLE_STAFF),
+                'nullable',
+                Rule::in(User::STAFF_POSITIONS),
+            ],
             'is_active' => ['nullable', 'boolean'],
             'location_id' => ['nullable', TenantRules::exists('locations')],
         ]);
+
+        $role = $data['role'] ?? $user->role;
+        if ($role !== User::ROLE_STAFF) {
+            $data['staff_position'] = null;
+        }
 
         if (empty($data['password'])) {
             unset($data['password']);

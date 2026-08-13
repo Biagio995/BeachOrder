@@ -37,6 +37,42 @@ class StripeOrderPaymentService
     }
 
     /**
+     * Pull the latest PaymentIntent state from Stripe and mark the order paid when succeeded.
+     */
+    public function syncPaymentStatus(Order $order): bool
+    {
+        if ($order->payment_status === 'paid') {
+            return true;
+        }
+
+        if (! in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
+            return false;
+        }
+
+        if (! $this->isConfigured() || ! $order->stripe_payment_intent_id) {
+            return false;
+        }
+
+        try {
+            $intent = $this->client()->paymentIntents->retrieve($order->stripe_payment_intent_id);
+
+            if ($intent->status === 'succeeded') {
+                $this->markPaidFromIntent($order, $intent);
+
+                return true;
+            }
+        } catch (ApiErrorException $e) {
+            Log::channel('payments')->warning('payment.sync_failed', [
+                'order_id' => $order->id,
+                'payment_intent_id' => $order->stripe_payment_intent_id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return $order->fresh()->payment_status === 'paid';
+    }
+
+    /**
      * @return array{client_secret: string, publishable_key: string, payment_intent_id: string}
      *
      * @throws ApiErrorException

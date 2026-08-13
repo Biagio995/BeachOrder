@@ -37,7 +37,7 @@ onMounted(async () => {
   }
 
   if (auth.isAuthenticated && auth.isEmailVerified) {
-    router.replace(homePathForRole(auth.user?.role))
+    router.replace(homePathForRole(auth.user?.role, auth.user?.staff_position))
     return
   }
   if (auth.token) {

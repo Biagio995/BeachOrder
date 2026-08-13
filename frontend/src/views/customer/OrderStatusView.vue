@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import api, { getApiErrorMessage, tenantPath } from '@/api/client'
 import { useMenuStore } from '@/stores/menu'
 import { useActiveOrderStore } from '@/stores/activeOrder'
 import { formatMoney } from '@/utils/money'
+import { waitForOrderPayment } from '@/utils/waitForOrderPayment'
 import OrderLineDetails from '@/components/shared/OrderLineDetails.vue'
 import OrderStatusJourney from '@/components/customer/OrderStatusJourney.vue'
 import ServiceUnavailable from '@/components/customer/ServiceUnavailable.vue'
@@ -63,8 +64,29 @@ async function load() {
 
 onMounted(async () => {
   await load()
+  if (shouldPollPendingPayment()) {
+    void ensurePaymentSynced()
+    startPendingPaymentPoll()
+  }
   void activeOrder.startWatching()
 })
+
+onBeforeUnmount(() => {
+  stopPendingPaymentPoll()
+})
+
+watch(
+  () => order.value?.payment_status,
+  (paymentStatus) => {
+    if (paymentStatus === 'paid') {
+      stopPendingPaymentPoll()
+      return
+    }
+    if (paymentStatus === 'pending') {
+      startPendingPaymentPoll()
+    }
+  },
+)
 
 watch(
   () => activeOrder.current?.status,
@@ -122,6 +144,46 @@ const paymentRoute = computed(() => ({
   params: { tenant: route.params.tenant, id: route.params.id },
   query: { session: route.query.session || menu.session },
 }))
+
+let pendingPaymentPoll: ReturnType<typeof setInterval> | null = null
+
+function stopPendingPaymentPoll() {
+  if (pendingPaymentPoll) {
+    clearInterval(pendingPaymentPoll)
+    pendingPaymentPoll = null
+  }
+}
+
+function shouldPollPendingPayment() {
+  if (!order.value) return false
+  return isOnlinePayment(order.value.payment_method) && order.value.payment_status === 'pending'
+}
+
+async function ensurePaymentSynced() {
+  const tenant = String(route.params.tenant || menu.tenantSlug)
+  const session = String(route.query.session || menu.session)
+  const synced = await waitForOrderPayment(tenant, route.params.id, session, {
+    maxAttempts: 12,
+    intervalMs: 500,
+  })
+  if (synced) {
+    order.value = synced
+    activeOrder.track(synced, tenant, session)
+  }
+}
+
+function startPendingPaymentPoll() {
+  stopPendingPaymentPoll()
+  if (!shouldPollPendingPayment()) return
+
+  pendingPaymentPoll = setInterval(() => {
+    if (!shouldPollPendingPayment()) {
+      stopPendingPaymentPoll()
+      return
+    }
+    void load()
+  }, 1500)
+}
 </script>
 
 <template>
