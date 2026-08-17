@@ -14,7 +14,7 @@ if ! devtunnel user show >/dev/null 2>&1; then
   devtunnel user login -g
 fi
 
-echo "==> Hosting porta $PORT (anonimo, descrizione: BeachOrder demo)"
+echo "==> Hosting porta $PORT (anonimo, descrizione: Servio demo)"
 echo
 echo "Prima di avviare il tunnel:"
 echo "  1. bash scripts/start-test-env.sh   (backend :8000 + frontend :5173)"
@@ -32,5 +32,5 @@ echo
 exec devtunnel host \
   -p "$PORT" \
   -a \
-  --description "BeachOrder demo" \
-  --labels beachorder demo presaordini
+  --description "Servio demo" \
+  --labels servio demo

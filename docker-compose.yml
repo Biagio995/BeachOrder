@@ -1,25 +1,25 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: beachorder-db
+    container_name: servio-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: beachorder
-      POSTGRES_USER: beachorder
-      POSTGRES_PASSWORD: beachorder
+      POSTGRES_DB: servio
+      POSTGRES_USER: servio
+      POSTGRES_PASSWORD: servio
     ports:
       - "5432:5432"
     volumes:
-      - beachorder_pgdata:/var/lib/postgresql/data
+      - servio_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U beachorder -d beachorder"]
+      test: ["CMD-SHELL", "pg_isready -U servio -d servio"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   redis:
     image: redis:7-alpine
-    container_name: beachorder-redis
+    container_name: servio-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -31,18 +31,18 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: beachorder-minio
+    container_name: servio-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: beachorder
-      MINIO_ROOT_PASSWORD: beachorder123
+      MINIO_ROOT_USER: servio
+      MINIO_ROOT_PASSWORD: servio123
     ports:
       - "9000:9000"
       - "9011:9001"
     volumes:
-      - beachorder_minio:/data
+      - servio_minio:/data
 
 volumes:
-  beachorder_pgdata:
-  beachorder_minio:
+  servio_pgdata:
+  servio_minio:

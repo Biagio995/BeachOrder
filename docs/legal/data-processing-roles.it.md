@@ -4,30 +4,30 @@
 
 ## Panoramica
 
-BeachOrder opera come piattaforma multi-tenant. I ruoli GDPR variano in base al tipo di dato e al soggetto interessato.
+Servio opera come piattaforma multi-tenant. I ruoli GDPR variano in base al tipo di dato e al soggetto interessato.
 
 ## Matrice dei ruoli
 
 | Scenario | Titolare (Controller) | Responsabile (Processor) |
 |----------|----------------------|--------------------------|
-| Dati staff del beach bar | Beach bar (tenant) | BeachOrder |
-| Dati ospiti che ordinano via QR | Beach bar (tenant) | BeachOrder |
-| Dati account admin BeachOrder (super_admin) | BeachOrder | — |
-| Dati registrazione tenant (ragione sociale) | Beach bar | BeachOrder (per onboarding) |
-| Log di audit piattaforma | BeachOrder | Sub-responsabili hosting |
+| Dati staff del locale | Locale (tenant) | Servio |
+| Dati ospiti che ordinano via QR | Locale (tenant) | Servio |
+| Dati account admin Servio (super_admin) | Servio | — |
+| Dati registrazione tenant (ragione sociale) | Locale (tenant) | Servio (per onboarding) |
+| Log di audit piattaforma | Servio | Sub-responsabili hosting |
 
-## Responsabilità del Titolare (beach bar)
+## Responsabilità del Titolare (ristorante)
 
-Il cliente business (beach bar) come Titolare deve:
+Il cliente business (ristorante) come Titolare deve:
 
-1. **Informare gli ospiti** — fornire un'informativa privacy del proprio stabilimento (BeachOrder fornisce il modello)
+1. **Informare gli ospiti** — fornire un'informativa privacy del proprio locale (Servio fornisce il modello)
 2. **Base giuridica** — definire la base giuridica per il trattamento dati ospiti (tipicamente legittimo interesse o contratto)
-3. **Diritti interessati** — gestire richieste degli ospiti; BeachOrder fornisce strumenti tecnici (anonimizzazione sessione)
-4. **DPA** — firmare l'Accordo sul Trattamento dei Dati con BeachOrder
+3. **Diritti interessati** — gestire richieste degli ospiti; Servio fornisce strumenti tecnici (anonimizzazione sessione)
+4. **DPA** — firmare l'Accordo sul Trattamento dei Dati con Servio
 
-## Responsabilità di BeachOrder (Processor)
+## Responsabilità di Servio (Processor)
 
-BeachOrder come Responsabile deve:
+Servio come Responsabile deve:
 
 1. Trattare i dati solo su istruzioni del Titolare
 2. Implementare misure di sicurezza (crittografia password, tenant isolation, rate limiting)
@@ -40,17 +40,17 @@ BeachOrder come Responsabile deve:
 ## Flusso dati
 
 ```
-Ospite → QR → BeachOrder API → DB tenant-scoped
+Ospite → QR → Servio API → DB tenant-scoped
                                     ↓
-                              Beach bar (accesso admin)
+                              Locale (accesso admin)
                                     ↓
                               Export / cancellazione su richiesta
 ```
 
 ## Contatti
 
-- **Privacy (Controller):** privacy@beachorder.example
-- **DPO / Processor:** dpo@beachorder.example
+- **Privacy (Controller):** privacy@servio.example
+- **DPO / Processor:** dpo@servio.example
 
 ## Riferimenti
 

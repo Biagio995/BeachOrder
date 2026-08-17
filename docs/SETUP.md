@@ -48,11 +48,11 @@ In VS Code/Cursor: **Terminal → Run Task → Frontend: DevTunnel (5173)**.
 
 ## Flusso demo
 
-1. Cliente: apri `http://localhost:5173/q/umbrella12`
+1. Cliente: apri `http://localhost:5173/t/azure-beach/q/table3`
 2. Aggiungi prodotti → carrello → invia ordine
-3. Bar: login `bar@beachorder.test` / `password` → `/kitchen`
-4. Cameriere: login `waiter@beachorder.test` → `/waiter`
-5. Admin: `admin@beachorder.test` → `/admin` (prezzi, QR, utenti)
+3. Bar: login `bar@servio.test` / `password` → `/kitchen`
+4. Cameriere: login `waiter@servio.test` → `/waiter`
+5. Admin: `admin@servio.test` → `/admin` (prezzi, QR, utenti)
 
 ## Sicurezza MVP
 

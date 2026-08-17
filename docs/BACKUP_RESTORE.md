@@ -1,6 +1,6 @@
 # Backup e restore database
 
-BeachOrder esegue backup automatici del database con copia remota (S3/MinIO), cifratura, retention configurabile, log e alert in caso di errore.
+Servio esegue backup automatici del database con copia remota (S3/MinIO), cifratura, retention configurabile, log e alert in caso di errore.
 
 ## Configurazione
 

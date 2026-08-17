@@ -1,15 +1,15 @@
 # Informativa sulla Privacy
 
 **Ultimo aggiornamento:** 10 agosto 2026  
-**Titolare del trattamento:** BeachOrder (privacy@beachorder.example)
+**Titolare del trattamento:** Servio (privacy@servio.example)
 
 ## 1. Chi siamo
 
-BeachOrder è una piattaforma SaaS che consente ai lidi e beach bar di gestire ordini tramite codice QR. Per i dati degli ospiti che ordinano dal proprio ombrellone, il **Titolare del trattamento** è il singolo stabilimento balneare (tenant); BeachOrder agisce come **Responsabile del trattamento** per conto del cliente business.
+Servio è una piattaforma SaaS che consente a ristoranti, bar e pizzerie di gestire ordini tramite codice QR. Per i dati degli ospiti che ordinano dal proprio tavolo o postazione, il **Titolare del trattamento** è il singolo locale (tenant); Servio agisce come **Responsabile del trattamento** per conto del cliente business.
 
 ## 2. Dati che raccogliamo
 
-### Utenti staff (operatori del lido)
+### Utenti staff (operatori del locale)
 - Nome, indirizzo email, password (crittografata)
 - Ruolo e tenant di appartenenza
 - Data accettazione Termini e Condizioni
@@ -31,7 +31,7 @@ BeachOrder è una piattaforma SaaS che consente ai lidi e beach bar di gestire o
 | Finalità | Base giuridica |
 |----------|----------------|
 | Erogazione del servizio SaaS | Esecuzione contratto (Art. 6(1)(b) GDPR) |
-| Gestione ordini QR | Legittimo interesse del titolare (lido) / contratto |
+| Gestione ordini QR | Legittimo interesse del titolare (locale) / contratto |
 | Sicurezza e audit | Legittimo interesse (Art. 6(1)(f) GDPR) |
 | Adempimenti legali | Obbligo di legge (Art. 6(1)(c) GDPR) |
 
@@ -57,11 +57,11 @@ Ai sensi del GDPR (Art. 15–22) hai diritto a:
 - **Limitazione** e **opposizione** al trattamento
 - **Reclamo** all'Autorità Garante (www.garanteprivacy.it)
 
-Per esercitare i diritti: privacy@beachorder.example
+Per esercitare i diritti: privacy@servio.example
 
 ## 6. Cookie e storage locale
 
-BeachOrder **non utilizza cookie di tracciamento**. Usa localStorage/sessionStorage per funzionalità essenziali (sessione ordine, carrello, lingua, consenso). Vedi la [Cookie Policy](/cookies).
+Servio **non utilizza cookie di tracciamento**. Usa localStorage/sessionStorage per funzionalità essenziali (sessione ordine, carrello, lingua, consenso). Vedi la [Cookie Policy](/cookies).
 
 ## 7. Sub-responsabili
 

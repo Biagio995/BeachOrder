@@ -1,4 +1,4 @@
-# BeachOrder – API
+# Servio – API
 
 Base URL: `http://localhost:8000/api`
 

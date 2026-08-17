@@ -1,15 +1,15 @@
 # Privacy Policy
 
 **Last updated:** 10 August 2026  
-**Data controller:** BeachOrder (privacy@beachorder.example)
+**Data controller:** Servio (privacy@servio.example)
 
 ## 1. Who we are
 
-BeachOrder is a SaaS platform enabling beach bars to manage QR-code orders. For guest ordering data, the **data controller** is the individual beach bar (tenant); BeachOrder acts as **data processor** on behalf of the business customer.
+Servio is a SaaS platform enabling restaurants, bars and pizzerias to manage QR-code orders. For guest ordering data, the **data controller** is the individual venue (tenant); Servio acts as **data processor** on behalf of the business customer.
 
 ## 2. Data we collect
 
-### Staff users (beach bar operators)
+### Staff users (venue operators)
 - Name, email address, password (encrypted)
 - Role and tenant affiliation
 - Terms acceptance timestamp
@@ -31,7 +31,7 @@ BeachOrder is a SaaS platform enabling beach bars to manage QR-code orders. For 
 | Purpose | Legal basis |
 |---------|-------------|
 | SaaS service delivery | Contract performance (Art. 6(1)(b) GDPR) |
-| QR order management | Legitimate interest of controller (beach bar) / contract |
+| QR order management | Legitimate interest of controller (venue) / contract |
 | Security and audit | Legitimate interest (Art. 6(1)(f) GDPR) |
 | Legal compliance | Legal obligation (Art. 6(1)(c) GDPR) |
 
@@ -57,11 +57,11 @@ Under the GDPR (Art. 15–22) you have the right to:
 - **Restriction** and **objection** to processing
 - **Complaint** to your supervisory authority
 
-To exercise your rights: privacy@beachorder.example
+To exercise your rights: privacy@servio.example
 
 ## 6. Cookies and local storage
 
-BeachOrder **does not use tracking cookies**. It uses localStorage/sessionStorage for essential functionality (order session, cart, language, consent). See our [Cookie Policy](/cookies).
+Servio **does not use tracking cookies**. It uses localStorage/sessionStorage for essential functionality (order session, cart, language, consent). See our [Cookie Policy](/cookies).
 
 ## 7. Sub-processors
 

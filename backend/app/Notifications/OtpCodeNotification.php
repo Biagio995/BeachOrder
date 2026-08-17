@@ -46,17 +46,17 @@ class OtpCodeNotification extends Notification
     private function subject(): string
     {
         return match ($this->purpose) {
-            OtpService::PURPOSE_PASSWORD_RESET => __('BeachOrder — Codice reset password'),
-            OtpService::PURPOSE_EMAIL_VERIFICATION => __('BeachOrder — Codice verifica email'),
-            default => __('BeachOrder — Codice OTP di test'),
+            OtpService::PURPOSE_PASSWORD_RESET => __('Servio — Codice reset password'),
+            OtpService::PURPOSE_EMAIL_VERIFICATION => __('Servio — Codice verifica email'),
+            default => __('Servio — Codice OTP di test'),
         };
     }
 
     private function intro(): string
     {
         return match ($this->purpose) {
-            OtpService::PURPOSE_PASSWORD_RESET => __('Usa questo codice per reimpostare la password del tuo account BeachOrder:'),
-            OtpService::PURPOSE_EMAIL_VERIFICATION => __('Usa questo codice per verificare l\'email e attivare il tuo account BeachOrder:'),
+            OtpService::PURPOSE_PASSWORD_RESET => __('Usa questo codice per reimpostare la password del tuo account Servio:'),
+            OtpService::PURPOSE_EMAIL_VERIFICATION => __('Usa questo codice per verificare l\'email e attivare il tuo account Servio:'),
             default => __('Questa è una email di test. Il codice OTP generato è:'),
         };
     }

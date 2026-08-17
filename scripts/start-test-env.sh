@@ -28,7 +28,7 @@ trap cleanup EXIT INT TERM
 echo
 echo "Test locale:  http://localhost:5173"
 echo "Demo QR:      http://localhost:5173/q/umbrella12"
-echo "Admin:        admin@beachorder.test / password"
+echo "Admin:        admin@servio.test / password"
 echo
 echo "Per condividere online: npm run tunnel (dalla cartella frontend)"
 echo "Premi Ctrl+C per fermare tutti i server."

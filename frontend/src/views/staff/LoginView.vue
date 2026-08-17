@@ -73,9 +73,9 @@ async function submit() {
       </router-link>
     </p>
     <div v-if="showDemoAccounts" class="text-caption text-medium-emphasis mt-6">
-      <div><strong>Azure Beach</strong> (slug: azure-beach)</div>
+      <div><strong>Demo locale</strong> (slug: azure-beach)</div>
       <div>admin@azure.test · manager@azure.test · staff@azure.test</div>
-      <div class="mt-2"><strong>Sunset Lido</strong> (slug: sunset-lido)</div>
+      <div class="mt-2"><strong>Demo secondo locale</strong> (slug: sunset-lido)</div>
       <div>admin@sunset.test · manager@sunset.test · staff@sunset.test</div>
       <div class="mt-2">password: password</div>
     </div>

@@ -1,4 +1,4 @@
-# PresaOrdini
+# Servio
 
 A full-stack, multi-tenant SaaS platform for **digital restaurant ordering**. Customers scan a QR code at their table, browse an interactive menu, place orders and pay online — while kitchen staff and waiters manage everything in real-time from a dedicated dashboard.
 
@@ -25,7 +25,7 @@ A full-stack, multi-tenant SaaS platform for **digital restaurant ordering**. Cu
 
 ## Overview
 
-PresaOrdini ("Order Taking" in Italian) is a white-label hospitality platform designed to modernize the order flow in restaurants, bars, and similar venues.
+Servio is a white-label hospitality platform designed to modernize the order flow in restaurants, bars, pizzerias, and similar venues.
 
 Each business onboards as an isolated **tenant** with its own menu, branding, locations, users, and subscription. Tenants can also connect to external POS systems, configure kitchen printers, and track sales analytics — all from a single back-office.
 
@@ -180,7 +180,7 @@ Key `.env` values to configure:
 ## Project Structure
 
 ```
-PresaOrdini/
+Servio/
 ├── backend/          # Laravel 12 REST API
 │   ├── app/
 │   │   ├── Console/      # Artisan commands (backup, monitoring, data retention)
@@ -225,7 +225,7 @@ PresaOrdini/
 
 ### POS Systems
 
-PresaOrdini forwards orders to external point-of-sale systems via a pluggable adapter pattern:
+Servio forwards orders to external point-of-sale systems via a pluggable adapter pattern:
 
 - **SoftOne** — REST adapter (`SoftOneAdapter`)
 - **Epsilon Pylon** — REST adapter (`EpsilonPylonAdapter`)

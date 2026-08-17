@@ -19,7 +19,7 @@ class PrintNodeDriver implements PrintDriverInterface
             ->timeout(15)
             ->post('https://api.printnode.com/printjobs', [
                 'printerId' => (int) $printerId,
-                'title' => 'BeachOrder ticket',
+                'title' => 'Servio ticket',
                 'contentType' => 'raw_base64',
                 'content' => base64_encode($payload),
             ]);

@@ -39,7 +39,7 @@ onUnmounted(() => observer?.disconnect())
         <p class="hero__lead">{{ t('landing.lead') }}</p>
         <div class="hero__actions">
           <v-btn
-            :to="'/t/azure-beach/q/umbrella12'"
+            :to="'/t/azure-beach/q/table3'"
             color="primary"
             size="large"
             class="hero__cta"
@@ -101,7 +101,7 @@ onUnmounted(() => observer?.disconnect())
       <h2 class="section__title display-font">{{ t('landing.finalTitle') }}</h2>
       <p class="section__lead">{{ t('landing.finalLead') }}</p>
       <div class="hero__actions">
-        <v-btn :to="'/t/azure-beach/q/umbrella12'" color="primary" size="large">
+        <v-btn :to="'/t/azure-beach/q/table3'" color="primary" size="large">
           {{ t('landing.ctaDemo') }}
         </v-btn>
         <v-btn to="/login" variant="tonal" size="large" color="primary">
@@ -153,7 +153,7 @@ onUnmounted(() => observer?.disconnect())
   position: absolute;
   inset: 0;
   background:
-    url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80')
+    url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=80')
       center / cover no-repeat;
   transform: scale(1.06);
   transition: transform 8s ease-out;
@@ -352,7 +352,7 @@ onUnmounted(() => observer?.disconnect())
   padding-bottom: 2.5rem;
   background:
     linear-gradient(135deg, rgba(11, 110, 107, 0.1), rgba(244, 201, 95, 0.12)),
-    url('https://images.unsplash.com/photo-1519046904884-4511a7e7cbfd?auto=format&fit=crop&w=1800&q=70')
+    url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1800&q=70')
       center / cover no-repeat;
   background-blend-mode: soft-light, normal;
   position: relative;

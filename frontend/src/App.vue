@@ -48,7 +48,7 @@ const isLegalPage = computed(
     route.name === 'dpa' ||
     route.name === 'data-processing-roles',
 )
-/** BeachOrder marketing/platform surfaces — never inherit a tenant white-label. */
+/** Servio marketing/platform surfaces — never inherit a tenant white-label. */
 const isPlatformSurface = computed(
   () => isLanding.value || isAuthPage.value || isLegalPage.value || route.name === 'admin-tenants',
 )

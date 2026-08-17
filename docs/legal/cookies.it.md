@@ -4,7 +4,7 @@
 
 ## Cosa usiamo
 
-BeachOrder **non installa cookie di profilazione o tracciamento**. Utilizziamo esclusivamente **localStorage** e **sessionStorage** del browser per funzionalità tecnicamente necessarie al servizio.
+Servio **non installa cookie di profilazione o tracciamento**. Utilizziamo esclusivamente **localStorage** e **sessionStorage** del browser per funzionalità tecnicamente necessarie al servizio.
 
 ## Storage utilizzati
 
@@ -29,8 +29,8 @@ Attualmente non utilizziamo cookie di terze parti. Se in futuro verranno introdo
 
 ## Come gestire le preferenze
 
-Puoi cancellare i dati in localStorage dalle impostazioni del browser. Per cancellare i dati della sessione ospite associati al tuo dispositivo, usa la funzione "Cancella i miei dati" nel menu cliente (se disponibile) o contatta il titolare del trattamento (lo stabilimento balneare).
+Puoi cancellare i dati in localStorage dalle impostazioni del browser. Per cancellare i dati della sessione ospite associati al tuo dispositivo, usa la funzione "Cancella i miei dati" nel menu cliente (se disponibile) o contatta il titolare del trattamento (lo locale).
 
 ## Contatti
 
-privacy@beachorder.example
+privacy@servio.example

@@ -12,21 +12,21 @@ class OtpServiceTest extends TestCase
     public function test_generate_store_and_verify(): void
     {
         $otp = app(OtpService::class);
-        $code = $otp->generateAndStore(OtpService::PURPOSE_TEST, 'demo@beachorder.test');
+        $code = $otp->generateAndStore(OtpService::PURPOSE_TEST, 'demo@servio.test');
 
         $this->assertMatchesRegularExpression('/^\d{6}$/', $code);
-        $this->assertTrue($otp->verify(OtpService::PURPOSE_TEST, 'demo@beachorder.test', $code));
+        $this->assertTrue($otp->verify(OtpService::PURPOSE_TEST, 'demo@servio.test', $code));
         // Consumed — second verify fails
-        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'demo@beachorder.test', $code));
+        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'demo@servio.test', $code));
     }
 
     public function test_wrong_code_increments_attempts(): void
     {
         $otp = app(OtpService::class);
-        $code = $otp->generateAndStore(OtpService::PURPOSE_TEST, 'demo2@beachorder.test');
+        $code = $otp->generateAndStore(OtpService::PURPOSE_TEST, 'demo2@servio.test');
 
-        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'demo2@beachorder.test', '000000'));
-        $this->assertTrue($otp->verify(OtpService::PURPOSE_TEST, 'demo2@beachorder.test', $code));
+        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'demo2@servio.test', '000000'));
+        $this->assertTrue($otp->verify(OtpService::PURPOSE_TEST, 'demo2@servio.test', $code));
     }
 
     public function test_send_test_dispatches_notification(): void
@@ -34,7 +34,7 @@ class OtpServiceTest extends TestCase
         Notification::fake();
 
         $otp = app(OtpService::class);
-        $code = $otp->sendTest('test@beachorder.test', OtpService::PURPOSE_PASSWORD_RESET);
+        $code = $otp->sendTest('test@servio.test', OtpService::PURPOSE_PASSWORD_RESET);
 
         $this->assertMatchesRegularExpression('/^\d{6}$/', $code);
         Notification::assertSentOnDemand(\App\Notifications\OtpCodeNotification::class);
@@ -46,10 +46,10 @@ class OtpServiceTest extends TestCase
         Cache::flush();
 
         $otp = app(OtpService::class);
-        $code = $otp->generateAndStore(OtpService::PURPOSE_TEST, 'lock@beachorder.test');
+        $code = $otp->generateAndStore(OtpService::PURPOSE_TEST, 'lock@servio.test');
 
-        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'lock@beachorder.test', '111111'));
-        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'lock@beachorder.test', '222222'));
-        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'lock@beachorder.test', $code));
+        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'lock@servio.test', '111111'));
+        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'lock@servio.test', '222222'));
+        $this->assertFalse($otp->verify(OtpService::PURPOSE_TEST, 'lock@servio.test', $code));
     }
 }

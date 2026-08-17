@@ -96,14 +96,14 @@ return [
     ],
 
     'controller' => [
-        'name' => env('PRIVACY_CONTROLLER_NAME', 'BeachOrder'),
-        'email' => env('PRIVACY_CONTROLLER_EMAIL', 'privacy@beachorder.example'),
+        'name' => env('PRIVACY_CONTROLLER_NAME', 'Servio'),
+        'email' => env('PRIVACY_CONTROLLER_EMAIL', 'privacy@servio.example'),
         'address' => env('PRIVACY_CONTROLLER_ADDRESS', ''),
     ],
 
     'processor' => [
-        'name' => env('PRIVACY_PROCESSOR_NAME', 'BeachOrder Platform'),
-        'email' => env('PRIVACY_PROCESSOR_EMAIL', 'dpo@beachorder.example'),
+        'name' => env('PRIVACY_PROCESSOR_NAME', 'Servio Platform'),
+        'email' => env('PRIVACY_PROCESSOR_EMAIL', 'dpo@servio.example'),
     ],
 
     /** Fields redacted from audit log snapshots. */

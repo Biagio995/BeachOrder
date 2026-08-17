@@ -1,4 +1,4 @@
-# Data Inventory — BeachOrder
+# Data Inventory — Servio
 
 **Last updated:** 10 August 2026  
 **GDPR Art. 30 — Record of processing activities**

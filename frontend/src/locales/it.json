@@ -1,31 +1,31 @@
 {
   "app": {
-    "name": "BeachOrder",
-    "tagline": "Ordina dall'ombrellone"
+    "name": "Servio",
+    "tagline": "Ordina dal tuo tavolo"
   },
   "landing": {
-    "headline": "Ordina dall'ombrellone, senza code al bancone.",
-    "lead": "BeachOrder porta menu, ordini e consegne sul QR del tuo ombrellone: più veloce per i clienti, più chiaro per bar e camerieri.",
+    "headline": "Ordina dal tavolo, senza code.",
+    "lead": "Servio mette menu, ordini e servizio sul QR del tuo locale: più veloce per i clienti, più chiaro per cucina e sala.",
     "ctaDemo": "Prova la demo",
     "ctaStaff": "Accesso staff",
-    "ctaRegister": "Registra il tuo beach bar",
+    "ctaRegister": "Registra il tuo locale",
     "howTitle": "Come funziona",
     "howLead": "Dal QR alla consegna, tutto in tempo reale.",
     "step1Title": "Scansiona",
-    "step1Text": "Il cliente apre il menu del suo ombrellone, lettino o tavolo.",
+    "step1Text": "Il cliente scansiona il QR al tavolo, all'ombrellone o al banco.",
     "step2Title": "Ordina",
     "step2Text": "Sceglie prodotti, aggiunge note e invia l'ordine in pochi tap.",
     "step3Title": "Ricevi",
     "step3Text": "Cucina prepara, il cameriere consegna, lo stato si aggiorna live.",
-    "forTitle": "Pensato per i beach bar",
-    "forLead": "Meno attese, meno errori, più scontrino medio — con un flusso pensato per la spiaggia.",
+    "forTitle": "Per bar, ristoranti e pizzerie",
+    "forLead": "Meno attese, meno errori, più scontrino medio — per qualsiasi locale con servizio al tavolo.",
     "benefit1": "Menu multilingua (IT, EN, EL, DE) e prezzi aggiornati all'istante",
     "benefit2": "Code separate per cucina/bar e camerieri",
     "benefit3": "Chiamata cameriere dal posto del cliente",
-    "benefit4": "QR unici per ogni posizione e branding white-label",
+    "benefit4": "QR unici per ogni tavolo o postazione e branding white-label",
     "finalTitle": "Provalo in un minuto",
     "finalLead": "Entra nella demo o accedi come staff per vedere cucina, consegne e admin.",
-    "footer": "Ordini da spiaggia, senza attrito."
+    "footer": "Servizio al tavolo, senza attrito."
   },
   "nav": {
     "menu": "Menu",
@@ -160,8 +160,8 @@
     "password": "Password",
     "submit": "Accedi",
     "tenant": "Tenant slug (opzionale)",
-    "tenantHint": "es. azure-beach",
-    "registerTitle": "Registra il tuo beach bar",
+    "tenantHint": "es. la-mia-pizzeria",
+    "registerTitle": "Registra il tuo locale",
     "registerLead": "La ragione sociale diventa il tuo tenant. Dopo la registrazione completerai subito l'abbonamento annuale.",
     "registerSubscriptionNotice": "L'abbonamento annuale (€299 + IVA) è obbligatorio per attivare il locale. Verrai reindirizzato a Stripe al termine della registrazione.",
     "registerSubmit": "Continua al pagamento",

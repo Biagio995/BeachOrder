@@ -29,7 +29,7 @@ class CriticalErrorAlerter
 
         try {
             Http::timeout(5)->post($webhook, [
-                'text' => sprintf('*[BeachOrder]* %s', $message),
+                'text' => sprintf('*[Servio]* %s', $message),
                 'attachments' => [[
                     'color' => 'danger',
                     'fields' => collect($context)->map(fn ($value, $field) => [

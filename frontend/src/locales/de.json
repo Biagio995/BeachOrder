@@ -1,31 +1,31 @@
 {
   "app": {
-    "name": "BeachOrder",
-    "tagline": "Bestellen vom Sonnenschirm"
+    "name": "Servio",
+    "tagline": "Bestellen am Tisch"
   },
   "landing": {
-    "headline": "Bestellen vom Sonnenschirm — ohne Bar-Warteschlange.",
-    "lead": "BeachOrder bringt Menü, Bestellungen und Lieferung auf den QR jedes Schirms: schneller für Gäste, klarer für Bar und Service.",
+    "headline": "Am Tisch bestellen — ohne Warteschlange.",
+    "lead": "Servio bringt Menü, Bestellungen und Service auf den QR jedes Tisches: schneller für Gäste, klarer für Küche und Service.",
     "ctaDemo": "Demo starten",
     "ctaStaff": "Mitarbeiter-Login",
-    "ctaRegister": "Beach-Bar registrieren",
+    "ctaRegister": "Lokal registrieren",
     "howTitle": "So funktioniert’s",
     "howLead": "Vom QR bis zur Lieferung — live.",
     "step1Title": "Scannen",
-    "step1Text": "Gäste öffnen das Menü ihres Schirms, Liegestuhls oder Tisches.",
+    "step1Text": "Gäste scannen den QR am Tisch, Liegestuhl oder Tresen.",
     "step2Title": "Bestellen",
     "step2Text": "Sie wählen Artikel, fügen Notizen hinzu und senden die Bestellung.",
     "step3Title": "Erhalten",
     "step3Text": "Die Küche bereitet vor, der Service liefert, der Status aktualisiert sich live.",
-    "forTitle": "Für Beach Bars gemacht",
-    "forLead": "Weniger Warten, weniger Fehler, höherer Bon — gedacht für den Strand.",
+    "forTitle": "Für Restaurants, Bars und Pizzerien",
+    "forLead": "Weniger Warten, weniger Fehler, höherer Bon — für jedes Lokal mit Tischservice.",
     "benefit1": "Mehrsprachiges Menü (IT, EN, EL, DE) mit sofortigen Preisupdates",
     "benefit2": "Getrennte Warteschlangen für Küche/Bar und Service",
     "benefit3": "Kellner vom Platz des Gastes rufen",
-    "benefit4": "Einzigartige QR pro Platz und White-Label-Branding",
+    "benefit4": "Einzigartige QR pro Tisch oder Platz und White-Label-Branding",
     "finalTitle": "In einer Minute testen",
     "finalLead": "Öffne die Demo oder melde dich als Mitarbeiter an.",
-    "footer": "Strandbestellung ohne Reibung."
+    "footer": "Tischbestellung ohne Reibung."
   },
   "nav": {
     "menu": "Menü",
@@ -160,8 +160,8 @@
     "password": "Passwort",
     "submit": "Anmelden",
     "tenant": "Tenant-Slug (optional)",
-    "tenantHint": "z. B. azure-beach",
-    "registerTitle": "Beach-Bar registrieren",
+    "tenantHint": "z. B. meine-pizzeria",
+    "registerTitle": "Lokal registrieren",
     "registerLead": "Die Firmenbezeichnung wird Ihr Tenant. Anschließend schließen Sie direkt das Jahresabonnement ab.",
     "registerSubscriptionNotice": "Das Jahresabonnement (299 € + MwSt.) ist erforderlich, um Ihr Lokal zu aktivieren. Nach der Registrierung werden Sie zu Stripe weitergeleitet.",
     "registerSubmit": "Weiter zur Zahlung",
