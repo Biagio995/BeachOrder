@@ -43,6 +43,11 @@ class DatabaseSeeder extends Seeder
                     'loyalty_enabled' => true,
                     'online_payments_enabled' => true,
                     'country' => 'IT',
+                    'nexi' => [
+                        'alias' => '89590947',
+                        'secret_key' => 'test_secret_key',
+                        'environment' => 'test',
+                    ],
                 ]),
                 'is_active' => true,
                 'is_demo' => true,
@@ -65,6 +70,11 @@ class DatabaseSeeder extends Seeder
                     'loyalty_enabled' => true,
                     'online_payments_enabled' => true,
                     'country' => 'GR',
+                    'nexi' => [
+                        'alias' => '89590947',
+                        'secret_key' => 'test_secret_key',
+                        'environment' => 'test',
+                    ],
                 ]),
                 'is_active' => true,
                 'is_demo' => true,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\NexiXPayService;
 use App\Services\PaymentService;
 use App\Services\StripeOrderPaymentService;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 class OrderPaymentController extends Controller
 {
     public function __construct(
+        private NexiXPayService $nexi,
         private StripeOrderPaymentService $stripePayments,
     ) {}
 
@@ -19,10 +21,66 @@ class OrderPaymentController extends Controller
     {
         $this->assertCustomerSession($request, $order);
 
-        if (! in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
+        if ($order->payment_method === 'card_online') {
+            return $this->cardOnlineSession($request, $order);
+        }
+
+        if (! in_array($order->payment_method, PaymentService::STRIPE_METHODS, true)) {
             return response()->json(['message' => 'Not an online payment order'], 422);
         }
 
+        return $this->legacyStripeSession($order);
+    }
+
+    public function receipt(Request $request, string $tenant, Order $order): JsonResponse
+    {
+        $this->assertCustomerSession($request, $order);
+
+        $receipt = $order->payment_method === 'card_online'
+            ? $this->nexi->receiptFor($order->load(['items', 'location']))
+            : $this->stripePayments->receiptFor($order->load(['items', 'location']));
+
+        if (! $receipt) {
+            return response()->json(['message' => 'Payment receipt not available'], 404);
+        }
+
+        return response()->json([
+            'order' => $order,
+            'receipt' => $receipt,
+        ]);
+    }
+
+    protected function cardOnlineSession(Request $request, Order $order): JsonResponse
+    {
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'order_id' => $order->id,
+                'type' => 'redirect',
+                'provider' => 'nexi',
+                'payment_status' => 'paid',
+                'amount' => (float) $order->total,
+                'currency' => strtoupper($order->tenant?->currency ?? 'EUR'),
+            ]);
+        }
+
+        if ($order->stripe_payment_intent_id && $this->stripePayments->isConfigured()) {
+            return $this->legacyStripeSession($order);
+        }
+
+        if (! $this->nexi->isConfigured($order->tenant)) {
+            return response()->json(['message' => 'Card payments are not configured for this venue.'], 503);
+        }
+
+        $session = (string) ($request->query('session') ?? $request->input('session'));
+
+        return response()->json([
+            'order_id' => $order->id,
+            ...$this->nexi->paymentSessionFor($order, $session),
+        ]);
+    }
+
+    protected function legacyStripeSession(Order $order): JsonResponse
+    {
         if (! $this->stripePayments->isConfigured()) {
             return response()->json(['message' => 'Online payments are not configured'], 503);
         }
@@ -50,22 +108,6 @@ class OrderPaymentController extends Controller
             'amount' => (float) $order->total,
             'currency' => strtoupper($order->tenant?->currency ?? 'EUR'),
             ...$payload,
-        ]);
-    }
-
-    public function receipt(Request $request, string $tenant, Order $order): JsonResponse
-    {
-        $this->assertCustomerSession($request, $order);
-
-        $receipt = $this->stripePayments->receiptFor($order->load(['items', 'location']));
-
-        if (! $receipt) {
-            return response()->json(['message' => 'Payment receipt not available'], 404);
-        }
-
-        return response()->json([
-            'order' => $order,
-            'receipt' => $receipt,
         ]);
     }
 

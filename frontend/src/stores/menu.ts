@@ -10,7 +10,7 @@ export interface TenantInfo {
   branding?: TenantBranding | null
   currency?: string
   default_locale?: string
-  settings?: Pick<TenantSettings, 'online_payments_enabled'> | null
+  settings?: Pick<TenantSettings, 'online_payments_enabled' | 'card_online_available'> | null
 }
 
 const ACCESS_KEY = 'bo_access_token'

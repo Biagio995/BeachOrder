@@ -448,7 +448,7 @@ class OrderFlowTest extends TestCase
         $this->postJson('/api/t/test-beach/orders', [
             'location_code' => 'umbrella99',
             'customer_session' => (string) Str::uuid(),
-            'payment_method' => 'card_online',
+            'payment_method' => 'bank_transfer',
             'items' => [
                 ['product_id' => $this->product->id, 'quantity' => 1],
             ],

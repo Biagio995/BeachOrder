@@ -208,6 +208,11 @@ const router = createRouter({
               component: () => import('@/views/admin/settings/GeneralSettingsView.vue'),
             },
             {
+              path: 'payments',
+              name: 'admin-settings-payments',
+              component: () => import('@/views/admin/settings/PaymentSettingsView.vue'),
+            },
+            {
               path: 'appearance',
               name: 'admin-settings-appearance',
               component: () => import('@/views/admin/settings/AppearanceSettingsView.vue'),

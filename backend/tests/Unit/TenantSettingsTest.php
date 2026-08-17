@@ -22,6 +22,7 @@ class TenantSettingsTest extends TestCase
         $this->assertFalse($settings['printing']['enabled']);
         $this->assertSame(9100, $settings['printing']['stations']['kitchen']['port']);
         $this->assertTrue($settings['online_payments_enabled']);
+        $this->assertNull($settings['nexi']['alias']);
     }
 
     public function test_merge_settings_preserves_sibling_keys(): void

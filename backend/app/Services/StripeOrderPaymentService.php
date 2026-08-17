@@ -45,7 +45,7 @@ class StripeOrderPaymentService
             return true;
         }
 
-        if (! in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
+        if (! in_array($order->payment_method, PaymentService::STRIPE_METHODS, true)) {
             return false;
         }
 
@@ -322,7 +322,7 @@ class StripeOrderPaymentService
 
     protected function assertPayableOnline(Order $order): void
     {
-        if (! in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
+        if (! in_array($order->payment_method, PaymentService::STRIPE_METHODS, true)) {
             throw ValidationException::withMessages([
                 'payment_method' => ['This order does not use online payment.'],
             ]);

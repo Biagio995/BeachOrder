@@ -69,6 +69,11 @@ class Tenant extends Model
             'loyalty_enabled' => true,
             'online_payments_enabled' => true,
             'country' => 'IT',
+            'nexi' => [
+                'alias' => null,
+                'secret_key' => null,
+                'environment' => 'test',
+            ],
             'fiscal' => [
                 'enabled' => false,
                 'provider' => null,
@@ -177,6 +182,21 @@ class Tenant extends Model
     public function onlinePaymentsEnabled(): bool
     {
         return (bool) $this->setting('online_payments_enabled', true);
+    }
+
+    public function onlineCardConfigured(): bool
+    {
+        $nexi = $this->nexiConfig();
+
+        return filled($nexi['alias'] ?? null) && filled($nexi['secret_key'] ?? null);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function nexiConfig(): array
+    {
+        return (array) $this->setting('nexi', []);
     }
 
     public function country(): string

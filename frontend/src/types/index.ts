@@ -37,10 +37,18 @@ export interface PrintingSettings {
   }
 }
 
+export interface NexiSettings {
+  alias?: string | null
+  secret_key?: string | null
+  environment?: 'test' | 'production'
+}
+
 export interface TenantSettings {
   loyalty_enabled?: boolean
   online_payments_enabled?: boolean
+  card_online_available?: boolean
   country?: string
+  nexi?: NexiSettings
   fiscal?: FiscalSettings
   pos?: PosSettings
   printing?: PrintingSettings

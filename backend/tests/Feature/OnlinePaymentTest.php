@@ -8,17 +8,16 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Services\StripeOrderPaymentService;
+use App\Services\NexiXPayService;
 use App\Support\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
-use Mockery\MockInterface;
 use Tests\TestCase;
 
 /**
- * US-11 — Online payment acceptance tests.
+ * US-11 — Online card payment acceptance tests (Nexi XPay).
  */
 class OnlinePaymentTest extends TestCase
 {
@@ -39,16 +38,22 @@ class OnlinePaymentTest extends TestCase
         parent::setUp();
 
         config([
-            'billing.stripe.key' => 'pk_test_fake',
-            'billing.stripe.secret' => 'sk_test_fake',
-            'billing.stripe.webhook_secret' => 'whsec_test_secret',
+            'app.url' => 'http://api.test',
+            'app.frontend_url' => 'http://frontend.test',
         ]);
 
         $this->tenant = Tenant::query()->create([
             'name' => 'Pay Beach',
             'slug' => 'pay-beach',
             'currency' => 'EUR',
-            'settings' => ['online_payments_enabled' => true],
+            'settings' => Tenant::defaultSettings([
+                'online_payments_enabled' => true,
+                'nexi' => [
+                    'alias' => 'test_alias',
+                    'secret_key' => 'test_secret_key',
+                    'environment' => 'test',
+                ],
+            ]),
             'is_active' => true,
         ]);
 
@@ -108,42 +113,6 @@ class OnlinePaymentTest extends TestCase
         $this->activateTenantSubscription($this->tenant);
     }
 
-    private function mockStripePaymentCreation(): void
-    {
-        $this->mock(StripeOrderPaymentService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('isConfigured')->andReturn(true);
-            $mock->shouldReceive('syncPaymentStatus')->andReturnUsing(function (Order $order) {
-                return $order->payment_status === 'paid';
-            });
-            $mock->shouldReceive('createOrRefreshPaymentIntent')->andReturnUsing(function (Order $order) {
-                $order->stripe_payment_intent_id = 'pi_test_'.Str::random(8);
-                $order->payment_status = 'pending';
-                $order->payment_error = null;
-                $order->save();
-
-                return [
-                    'client_secret' => 'pi_test_secret_'.Str::random(8),
-                    'publishable_key' => 'pk_test_fake',
-                    'payment_intent_id' => $order->stripe_payment_intent_id,
-                ];
-            });
-            $mock->shouldReceive('receiptFor')->andReturnUsing(function (Order $order) {
-                if ($order->payment_status !== 'paid') {
-                    return null;
-                }
-
-                return [
-                    'reference' => $order->payment_reference,
-                    'stripe_payment_intent_id' => $order->stripe_payment_intent_id,
-                    'paid_at' => $order->paid_at?->toIso8601String(),
-                    'amount' => (float) $order->total,
-                    'currency' => 'EUR',
-                    'method' => $order->payment_method,
-                ];
-            });
-        });
-    }
-
     /**
      * @return array{customer_session: string, access_token: string}
      */
@@ -161,9 +130,8 @@ class OnlinePaymentTest extends TestCase
         ];
     }
 
-    public function test_online_order_stays_pending_and_returns_payment_intent(): void
+    public function test_card_online_order_stays_pending(): void
     {
-        $this->mockStripePaymentCreation();
         $access = $this->claimAccess();
 
         $response = $this->postJson('/api/t/pay-beach/orders', [
@@ -171,7 +139,6 @@ class OnlinePaymentTest extends TestCase
             'access_token' => $access['access_token'],
             'customer_session' => $access['customer_session'],
             'payment_method' => 'card_online',
-            'confirm_payment' => true,
             'items' => [
                 ['product_id' => $this->product->id, 'quantity' => 1],
             ],
@@ -179,13 +146,34 @@ class OnlinePaymentTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('payment_status', 'pending')
-            ->assertJsonPath('payment.client_secret', fn ($v) => filled($v))
-            ->assertJsonPath('payment.publishable_key', 'pk_test_fake');
+            ->assertJsonPath('payment_method', 'card_online');
 
         $this->assertDatabaseHas('orders', [
             'id' => $response->json('id'),
             'payment_status' => 'pending',
         ]);
+    }
+
+    public function test_card_online_requires_nexi_configuration(): void
+    {
+        $this->tenant->update([
+            'settings' => Tenant::defaultSettings([
+                'online_payments_enabled' => true,
+                'nexi' => ['alias' => null, 'secret_key' => null],
+            ]),
+        ]);
+
+        $access = $this->claimAccess();
+
+        $this->postJson('/api/t/pay-beach/orders', [
+            'location_code' => 'umbrella7',
+            'access_token' => $access['access_token'],
+            'customer_session' => $access['customer_session'],
+            'payment_method' => 'card_online',
+            'items' => [
+                ['product_id' => $this->product->id, 'quantity' => 1],
+            ],
+        ])->assertStatus(422);
     }
 
     /**
@@ -204,16 +192,7 @@ class OnlinePaymentTest extends TestCase
         ], $attributes));
     }
 
-    private function stripeSignature(string $payload): string
-    {
-        $timestamp = time();
-        $secret = (string) config('billing.stripe.webhook_secret');
-        $signed = hash_hmac('sha256', "{$timestamp}.{$payload}", $secret);
-
-        return "t={$timestamp},v1={$signed}";
-    }
-
-    public function test_frontend_cannot_mark_online_order_as_paid(): void
+    public function test_staff_cannot_mark_card_order_as_paid(): void
     {
         Sanctum::actingAs($this->admin);
 
@@ -222,7 +201,7 @@ class OnlinePaymentTest extends TestCase
             'customer_session' => (string) Str::uuid(),
             'payment_method' => 'card_online',
             'payment_status' => 'pending',
-            'stripe_payment_intent_id' => 'pi_test_blocked',
+            'payment_reference' => 'BO-PAY-TEST1234',
         ]);
 
         $this->withHeader('X-Tenant', 'pay-beach')
@@ -231,96 +210,61 @@ class OnlinePaymentTest extends TestCase
             ])->assertStatus(422);
     }
 
-    public function test_webhook_marks_order_paid(): void
+    public function test_customer_receives_nexi_redirect_session(): void
     {
+        $session = (string) Str::uuid();
+
         $order = $this->createOrder([
             'order_number' => 'BO-TEST-002',
-            'customer_session' => (string) Str::uuid(),
+            'customer_session' => $session,
             'payment_method' => 'card_online',
             'payment_status' => 'pending',
             'payment_reference' => 'BO-PAY-TEST1234',
-            'stripe_payment_intent_id' => 'pi_test_success',
         ]);
 
-        $payload = json_encode([
-            'id' => 'evt_test_success',
-            'object' => 'event',
-            'type' => 'payment_intent.succeeded',
-            'data' => [
-                'object' => [
-                    'id' => 'pi_test_success',
-                    'object' => 'payment_intent',
-                    'metadata' => [
-                        'order_id' => (string) $order->id,
-                        'tenant_id' => (string) $this->tenant->id,
-                    ],
-                ],
-            ],
-        ]);
-
-        $signature = $this->stripeSignature($payload);
-
-        $this->call(
-            'POST',
-            '/api/webhooks/stripe',
-            [],
-            [],
-            [],
-            ['HTTP_Stripe-Signature' => $signature, 'CONTENT_TYPE' => 'application/json'],
-            $payload,
-        )->assertOk();
-
-        $order->refresh();
-        $this->assertSame('paid', $order->payment_status);
-        $this->assertNotNull($order->paid_at);
+        $this->getJson("/api/t/pay-beach/orders/{$order->id}/payment?session={$session}")
+            ->assertOk()
+            ->assertJsonPath('type', 'redirect')
+            ->assertJsonPath('provider', 'nexi')
+            ->assertJsonPath('fields.alias', 'test_alias')
+            ->assertJsonPath('gateway_url', 'https://int-ecommerce.nexi.it/ecomm/ecomm/DispatcherServlet');
     }
 
-    public function test_webhook_marks_order_failed(): void
+    public function test_nexi_webhook_marks_order_paid(): void
     {
         $order = $this->createOrder([
             'order_number' => 'BO-TEST-003',
             'customer_session' => (string) Str::uuid(),
             'payment_method' => 'card_online',
             'payment_status' => 'pending',
-            'stripe_payment_intent_id' => 'pi_test_failed',
+            'payment_reference' => 'BO-PAY-WEBHOOK1',
         ]);
 
-        $payload = json_encode([
-            'id' => 'evt_test_failed',
-            'object' => 'event',
-            'type' => 'payment_intent.payment_failed',
-            'data' => [
-                'object' => [
-                    'id' => 'pi_test_failed',
-                    'object' => 'payment_intent',
-                    'metadata' => ['order_id' => (string) $order->id],
-                    'last_payment_error' => ['message' => 'Your card was declined.'],
-                ],
-            ],
-        ]);
+        $nexi = app(NexiXPayService::class);
+        $codTrans = $nexi->codTransFor($order);
+        $importo = '850';
+        $divisa = 'EUR';
+        $data = '20260817';
+        $orario = '120000';
+        $codAut = 'AUTH01';
+        $esito = 'OK';
+        $mac = sha1("codTrans={$codTrans}esito={$esito}importo={$importo}divisa={$divisa}data={$data}orario={$orario}codAut={$codAut}test_secret_key");
 
-        $signature = $this->stripeSignature($payload);
-
-        $this->call(
-            'POST',
-            '/api/webhooks/stripe',
-            [],
-            [],
-            [],
-            ['HTTP_Stripe-Signature' => $signature, 'CONTENT_TYPE' => 'application/json'],
-            $payload,
-        )->assertOk();
+        $this->post('/api/webhooks/nexi/pay-beach', [
+            'codTrans' => $codTrans,
+            'esito' => $esito,
+            'importo' => $importo,
+            'divisa' => $divisa,
+            'data' => $data,
+            'orario' => $orario,
+            'codAut' => $codAut,
+            'mac' => $mac,
+        ])->assertOk();
 
         $order->refresh();
-        $this->assertSame('failed', $order->payment_status);
-        $this->assertSame('Your card was declined.', $order->payment_error);
-    }
-
-    public function test_webhook_rejects_invalid_signature(): void
-    {
-        $this->postJson('/api/webhooks/stripe', ['type' => 'payment_intent.succeeded'], [
-            'Stripe-Signature' => 'invalid',
-        ])->assertStatus(400);
+        $this->assertSame('paid', $order->payment_status);
+        $this->assertSame('AUTH01', $order->payment_authorization_code);
+        $this->assertNotNull($order->paid_at);
     }
 
     public function test_unpaid_online_orders_hidden_from_kitchen_board(): void
@@ -348,90 +292,5 @@ class OnlinePaymentTest extends TestCase
 
         $this->assertNotContains('BO-PENDING', $numbers);
         $this->assertContains('BO-PAID', $numbers);
-    }
-
-    public function test_customer_can_fetch_payment_receipt_when_paid(): void
-    {
-        $this->mockStripePaymentCreation();
-        $session = (string) Str::uuid();
-
-        $order = $this->createOrder([
-            'order_number' => 'BO-TEST-004',
-            'customer_session' => $session,
-            'payment_method' => 'card_online',
-            'payment_status' => 'paid',
-            'payment_reference' => 'BO-PAY-RCPT1234',
-            'stripe_payment_intent_id' => 'pi_test_receipt',
-            'paid_at' => now(),
-        ]);
-
-        $this->getJson("/api/t/pay-beach/orders/{$order->id}?session={$session}")
-            ->assertOk()
-            ->assertJsonPath('payment_receipt.reference', 'BO-PAY-RCPT1234')
-            ->assertJsonPath('payment_receipt.stripe_payment_intent_id', 'pi_test_receipt');
-
-        $this->getJson("/api/t/pay-beach/orders/{$order->id}/payment/receipt?session={$session}")
-            ->assertOk()
-            ->assertJsonPath('receipt.amount', 8.5);
-    }
-
-    public function test_customer_can_retry_failed_payment(): void
-    {
-        $this->mockStripePaymentCreation();
-        $session = (string) Str::uuid();
-
-        $order = $this->createOrder([
-            'order_number' => 'BO-TEST-005',
-            'customer_session' => $session,
-            'payment_method' => 'card_online',
-            'payment_status' => 'failed',
-            'payment_error' => 'Card declined',
-            'stripe_payment_intent_id' => 'pi_test_old',
-        ]);
-
-        $this->getJson("/api/t/pay-beach/orders/{$order->id}/payment?session={$session}")
-            ->assertOk()
-            ->assertJsonPath('payment_status', 'pending')
-            ->assertJsonStructure(['client_secret', 'publishable_key', 'payment_intent_id']);
-    }
-
-    public function test_customer_order_show_syncs_succeeded_stripe_payment(): void
-    {
-        $session = (string) Str::uuid();
-
-        $order = $this->createOrder([
-            'order_number' => 'BO-TEST-SYNC',
-            'customer_session' => $session,
-            'payment_method' => 'card_online',
-            'payment_status' => 'pending',
-            'stripe_payment_intent_id' => 'pi_test_sync',
-        ]);
-
-        $this->partialMock(StripeOrderPaymentService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('isConfigured')->andReturn(true);
-            $mock->shouldReceive('syncPaymentStatus')->andReturnUsing(function (Order $order) {
-                $order->payment_status = 'paid';
-                $order->paid_at = now();
-                $order->payment_reference = 'BO-PAY-SYNC123';
-                $order->save();
-
-                return true;
-            });
-            $mock->shouldReceive('receiptFor')->andReturnUsing(function (Order $order) {
-                return [
-                    'reference' => $order->payment_reference,
-                    'stripe_payment_intent_id' => $order->stripe_payment_intent_id,
-                    'paid_at' => $order->paid_at?->toIso8601String(),
-                    'amount' => (float) $order->total,
-                    'currency' => 'EUR',
-                    'method' => $order->payment_method,
-                ];
-            });
-        });
-
-        $this->getJson("/api/t/pay-beach/orders/{$order->id}?session={$session}")
-            ->assertOk()
-            ->assertJsonPath('payment_status', 'paid')
-            ->assertJsonPath('payment_receipt.reference', 'BO-PAY-SYNC123');
     }
 }

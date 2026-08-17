@@ -15,6 +15,7 @@ use App\Services\PaymentService;
 use App\Services\Pos\PosOrderSyncService;
 use App\Services\Printing\PrintService;
 use App\Services\ProductCustomizationService;
+use App\Services\NexiXPayService;
 use App\Services\StripeOrderPaymentService;
 use App\Support\LocalizedText;
 use App\Support\RolePermissions;
@@ -65,16 +66,18 @@ class OrderController extends Controller
         $tenant = TenantContext::get();
         $method = $data['payment_method'] ?? 'pay_at_location';
 
-        if (in_array($method, PaymentService::ONLINE_METHODS, true) && ! $tenant?->onlinePaymentsEnabled()) {
-            throw ValidationException::withMessages([
-                'payment_method' => ['Online payments are disabled for this venue.'],
-            ]);
-        }
+        if ($method === 'card_online') {
+            if (! $tenant?->onlinePaymentsEnabled()) {
+                throw ValidationException::withMessages([
+                    'payment_method' => ['Online payments are disabled for this venue.'],
+                ]);
+            }
 
-        if (in_array($method, PaymentService::ONLINE_METHODS, true) && ! $this->stripePayments->isConfigured()) {
-            throw ValidationException::withMessages([
-                'payment_method' => ['Online payments are not configured for this venue.'],
-            ]);
+            if (! $tenant?->onlineCardConfigured()) {
+                throw ValidationException::withMessages([
+                    'payment_method' => ['Card payments are not configured for this venue.'],
+                ]);
+            }
         }
 
         $location = Location::query()
@@ -173,14 +176,6 @@ class OrderController extends Controller
 
         $response = $order->toArray();
 
-        if (in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
-            try {
-                $response['payment'] = $this->stripePayments->createOrRefreshPaymentIntent($order);
-            } catch (\Throwable $e) {
-                // Order exists; customer can retry from payment page.
-            }
-        }
-
         try {
             event(new OrderUpdated($order));
         } catch (\Throwable) {
@@ -212,13 +207,15 @@ class OrderController extends Controller
 
         $session = $request->query('session');
         if ($session && $order->customer_session && hash_equals($order->customer_session, (string) $session)) {
-            if (in_array($order->payment_method, PaymentService::ONLINE_METHODS, true)) {
+            if (in_array($order->payment_method, PaymentService::STRIPE_METHODS, true)) {
                 app(StripeOrderPaymentService::class)->syncPaymentStatus($order);
                 $order->refresh();
             }
 
             $payload = $order->toArray();
-            $payload['payment_receipt'] = app(StripeOrderPaymentService::class)->receiptFor($order);
+            $payload['payment_receipt'] = $order->payment_method === 'card_online'
+                ? app(NexiXPayService::class)->receiptFor($order)
+                : app(StripeOrderPaymentService::class)->receiptFor($order);
 
             return response()->json($payload);
         }
@@ -465,6 +462,11 @@ class OrderController extends Controller
 
         $old = $order->payment_status;
         $order->payment_status = $data['payment_status'];
+
+        if ($data['payment_status'] === 'paid' && ! $order->paid_at) {
+            $order->paid_at = now();
+        }
+
         $order->save();
         $order->load(['items', 'location']);
 

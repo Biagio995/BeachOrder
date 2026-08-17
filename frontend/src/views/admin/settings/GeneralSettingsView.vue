@@ -97,6 +97,12 @@ onMounted(hydrate)
           hide-details
         />
       </v-col>
+      <v-col cols="12">
+        <p class="text-body-2 text-medium-emphasis mb-0">
+          {{ t('admin.nexiPaymentsHint') }}
+          <router-link to="/admin/settings/payments">{{ t('admin.settingsPayments') }}</router-link>
+        </p>
+      </v-col>
     </v-row>
 
     <template #actions>

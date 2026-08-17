@@ -5,6 +5,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Api\PrivacyController;
 use App\Http\Controllers\Api\Admin\PrintingSettingsController;
 use App\Http\Controllers\Api\Admin\TenantSettingsController;
+use App\Http\Controllers\Webhook\NexiWebhookController;
 use App\Http\Controllers\Webhook\PosWebhookController;
 use App\Http\Controllers\Webhook\StripeWebhookController;
 use App\Http\Controllers\Api\Admin\PosIntegrationController;
@@ -35,6 +36,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/webhooks/stripe', StripeWebhookController::class);
+Route::post('/webhooks/nexi/{tenant}', [NexiWebhookController::class, 'notify']);
 Route::post('/webhooks/pos/{tenant}', PosWebhookController::class);
 
 /*
@@ -63,6 +65,7 @@ Route::prefix('t/{tenant}')->middleware(['tenant.route', 'throttle:60,1'])->grou
     Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:20,1');
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::get('/orders/{order}/payment', [OrderPaymentController::class, 'show']);
+    Route::post('/orders/{order}/payment/nexi/return', [NexiWebhookController::class, 'customerReturn']);
     Route::get('/orders/{order}/payment/receipt', [OrderPaymentController::class, 'receipt']);
 
     Route::post('/waiter-call', [WaiterCallController::class, 'store'])->middleware('throttle:10,1');

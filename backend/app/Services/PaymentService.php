@@ -7,9 +7,13 @@ use Illuminate\Support\Str;
 
 class PaymentService
 {
-    public const METHODS = ['pay_at_location', 'card_online', 'apple_pay', 'google_pay'];
+    public const METHODS = ['pay_at_location', 'card_online'];
 
-    public const ONLINE_METHODS = ['card_online', 'apple_pay', 'google_pay'];
+    /** @var list<string> */
+    public const ONLINE_METHODS = ['card_online'];
+
+    /** @var list<string> Legacy Stripe checkout methods kept for existing orders. */
+    public const STRIPE_METHODS = ['card_online', 'apple_pay', 'google_pay'];
 
     public function markPending(Order $order, string $method): Order
     {
@@ -25,16 +29,18 @@ class PaymentService
 
     public function isOnlineMethod(?string $method): bool
     {
-        return in_array($method, self::ONLINE_METHODS, true);
+        return in_array($method, self::ONLINE_METHODS, true)
+            || in_array($method, self::STRIPE_METHODS, true);
+    }
+
+    public function isStripeMethod(?string $method): bool
+    {
+        return in_array($method, self::STRIPE_METHODS, true);
     }
 
     public function canStaffSetPaymentStatus(Order $order, string $status): bool
     {
-        if ($this->isOnlineMethod($order->payment_method) && $status === 'paid') {
-            return false;
-        }
-
-        if ($this->isOnlineMethod($order->payment_method) && $status === 'pending') {
+        if ($this->isOnlineMethod($order->payment_method) && in_array($status, ['paid', 'pending'], true)) {
             return false;
         }
 

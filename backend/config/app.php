@@ -57,6 +57,12 @@ return [
     'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
 
     /*
+    | Public HTTPS URL reachable by browsers and payment webhooks (DevTunnel, production).
+    | Defaults to FRONTEND_URL — Vite preview proxies /api to Laravel on the same origin.
+    */
+    'public_url' => env('PUBLIC_URL', env('FRONTEND_URL', env('APP_URL', 'http://localhost'))),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------

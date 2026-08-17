@@ -49,6 +49,7 @@ class Order extends Model
         'stripe_payment_intent_id',
         'paid_at',
         'payment_error',
+        'payment_authorization_code',
         'loyalty_points_earned',
         'accepted_by',
         'delivered_by',

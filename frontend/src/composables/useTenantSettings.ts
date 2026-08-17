@@ -28,6 +28,11 @@ export type TenantSettingsPayload = {
   settings: {
     online_payments_enabled: boolean
     country: string
+    nexi: {
+      alias: string
+      secret_key: string
+      environment: 'test' | 'production'
+    }
     fiscal: {
       enabled: boolean
       provider: FiscalProvider | null
@@ -70,6 +75,11 @@ const emptyPayload = (): TenantSettingsPayload => ({
   settings: {
     online_payments_enabled: true,
     country: 'IT',
+    nexi: {
+      alias: '',
+      secret_key: '',
+      environment: 'test',
+    },
     fiscal: {
       enabled: false,
       provider: null,
@@ -115,6 +125,11 @@ function mapResponse(data: Record<string, any>): TenantSettingsPayload {
     settings: {
       online_payments_enabled: s.online_payments_enabled ?? true,
       country: (s.country || 'IT').toUpperCase(),
+      nexi: {
+        alias: s.nexi?.alias || '',
+        secret_key: s.nexi?.secret_key || '',
+        environment: s.nexi?.environment === 'production' ? 'production' : 'test',
+      },
       fiscal: {
         enabled: s.fiscal?.enabled ?? false,
         provider: s.fiscal?.provider ?? null,
@@ -182,6 +197,10 @@ function syncTenantStores(mapped: TenantSettingsPayload) {
       branding: { ...mapped.branding },
       settings: {
         online_payments_enabled: mapped.settings.online_payments_enabled,
+        card_online_available:
+          mapped.settings.online_payments_enabled
+          && mapped.settings.nexi.alias.trim() !== ''
+          && mapped.settings.nexi.secret_key.trim() !== '',
       },
     }
   }

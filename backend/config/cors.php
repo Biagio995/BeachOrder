@@ -13,6 +13,7 @@ return [
         '#^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|100\.\d+\.\d+\.\d+)(:\d+)?$#',
         '#^https?://.*\.cursor\.sh$#',
         '#^https?://.*\.github\.dev$#',
+        '#^https?://.*\.devtunnels\.ms$#',
     ],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],

@@ -25,18 +25,16 @@ const error = ref('')
 
 const currency = computed(() => menu.tenant?.currency || 'EUR')
 const onlineEnabled = computed(() => menu.tenant?.settings?.online_payments_enabled !== false)
+const cardOnlineEnabled = computed(
+  () => onlineEnabled.value && menu.tenant?.settings?.card_online_available === true,
+)
 
-const isOnlinePayment = (method: string) =>
-  method === 'card_online' || method === 'apple_pay' || method === 'google_pay'
+const isOnlinePayment = (method: string) => method === 'card_online'
 
 const paymentOptions = computed(() => {
   const options = [{ value: 'pay_at_location', title: t('cart.payment.pay_at_location') }]
-  if (onlineEnabled.value) {
-    options.push(
-      { value: 'card_online', title: t('cart.payment.card_online') },
-      { value: 'apple_pay', title: t('cart.payment.apple_pay') },
-      { value: 'google_pay', title: t('cart.payment.google_pay') },
-    )
+  if (cardOnlineEnabled.value) {
+    options.push({ value: 'card_online', title: t('cart.payment.card_online') })
   }
   return options
 })

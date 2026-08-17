@@ -112,6 +112,7 @@ class MenuController extends Controller
             'default_locale' => $tenant->default_locale,
             'settings' => [
                 'online_payments_enabled' => $tenant->onlinePaymentsEnabled(),
+                'card_online_available' => $tenant->onlinePaymentsEnabled() && $tenant->onlineCardConfigured(),
             ],
         ];
     }
