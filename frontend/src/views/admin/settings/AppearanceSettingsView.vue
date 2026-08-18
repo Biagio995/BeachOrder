@@ -128,7 +128,7 @@ onMounted(hydrate)
         <v-text-field v-model="form.name" :label="t('admin.venueName')" />
       </v-col>
       <v-col cols="12" md="6">
-        <v-text-field v-model="form.tagline" :label="t('admin.tagline')" />
+        <v-text-field v-model="form.tagline" :label="t('admin.tagline')" :hint="t('admin.taglineHint')" persistent-hint />
       </v-col>
 
       <v-col cols="12">
@@ -173,7 +173,7 @@ onMounted(hydrate)
         <v-text-field v-model="form.primary_color" :label="t('admin.primaryColor')" type="color" />
       </v-col>
       <v-col cols="6" md="3">
-        <v-text-field v-model="form.accent_color" :label="t('admin.secondaryColor')" type="color" />
+        <v-text-field v-model="form.accent_color" :label="t('admin.secondaryColor')" :hint="t('admin.secondaryColorHint')" persistent-hint type="color" />
       </v-col>
       <v-col cols="12">
         <p class="text-caption text-medium-emphasis mb-0">{{ t('admin.colorHint') }}</p>

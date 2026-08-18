@@ -80,7 +80,6 @@ class AuthController extends Controller
                 ],
                 'settings' => Tenant::defaultSettings([
                     'loyalty_enabled' => false,
-                    'online_payments_enabled' => true,
                     'country' => 'IT',
                 ]),
                 'is_active' => false,

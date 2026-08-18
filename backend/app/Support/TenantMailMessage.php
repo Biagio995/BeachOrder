@@ -7,24 +7,25 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class TenantMailMessage
 {
-    public static function salutation(?Tenant $tenant): string
+    public static function salutation(?Tenant $tenant, bool $platform = false): string
     {
-        if ($tenant?->name) {
+        if (! $platform && $tenant?->name) {
             return __('Il team :tenant', ['tenant' => $tenant->name]);
         }
 
         return __('Il team Servio');
     }
 
-    public static function apply(MailMessage $mail, ?Tenant $tenant): MailMessage
+    public static function apply(MailMessage $mail, ?Tenant $tenant, bool $platform = false): MailMessage
     {
-        $branding = TenantBranding::resolve($tenant?->branding);
+        $branding = TenantBranding::resolve($platform ? null : $tenant?->branding);
         $primary = $branding['primary_color'] ?? null;
 
-        if (is_string($primary) && preg_match('/^#[0-9a-fA-F]{6}$/', $primary)) {
+        // Laravel theme() is a markdown view name, not a hex color.
+        if (is_string($primary) && preg_match('/^[a-zA-Z][\w-]*$/', $primary)) {
             $mail->theme($primary);
         }
 
-        return $mail->salutation(self::salutation($tenant));
+        return $mail->salutation(self::salutation($tenant, $platform));
     }
 }

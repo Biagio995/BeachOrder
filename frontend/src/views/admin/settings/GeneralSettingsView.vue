@@ -14,7 +14,6 @@ const form = ref({
   default_locale: 'el',
   currency: 'EUR',
   country: 'IT',
-  online_payments_enabled: true,
 })
 
 const countryItems = computed(() =>
@@ -33,7 +32,6 @@ async function hydrate() {
     default_locale: data.default_locale,
     currency: data.currency,
     country: data.settings.country,
-    online_payments_enabled: data.settings.online_payments_enabled,
   }
 }
 
@@ -44,7 +42,6 @@ async function onSave() {
     currency: form.value.currency,
     settings: {
       country: form.value.country,
-      online_payments_enabled: form.value.online_payments_enabled,
     },
   })
   flashSaved()
@@ -61,8 +58,6 @@ onMounted(hydrate)
       <div class="text-h6 mb-1">{{ current.name || '—' }}</div>
       <div class="text-body-2 text-medium-emphasis">
         {{ current.settings.country }} · {{ current.currency }} · {{ current.default_locale }}
-        · {{ t('admin.onlinePayments') }}:
-        {{ current.settings.online_payments_enabled ? 'on' : 'off' }}
       </div>
     </template>
 
@@ -88,20 +83,6 @@ onMounted(hydrate)
           :items="localeItems"
           :label="t('admin.defaultLocale')"
         />
-      </v-col>
-      <v-col cols="12" md="6" class="d-flex align-center">
-        <v-switch
-          v-model="form.online_payments_enabled"
-          :label="t('admin.onlinePayments')"
-          color="primary"
-          hide-details
-        />
-      </v-col>
-      <v-col cols="12">
-        <p class="text-body-2 text-medium-emphasis mb-0">
-          {{ t('admin.nexiPaymentsHint') }}
-          <router-link to="/admin/settings/payments">{{ t('admin.settingsPayments') }}</router-link>
-        </p>
       </v-col>
     </v-row>
 

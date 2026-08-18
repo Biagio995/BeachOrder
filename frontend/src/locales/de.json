@@ -82,7 +82,7 @@
     "confirmRemoveMessage": "„{name}“ aus dem Warenkorb entfernen?",
     "payment": {
       "pay_at_location": "Vor Ort zahlen",
-      "card_online": "Karte online"
+      "card_online": "Karte (POS)"
     }
   },
   "payment": {
@@ -305,13 +305,15 @@
     "settingsPos": "POS",
     "settingsPrinting": "Bestelldruck",
     "settingsSubscription": "Abonnement",
-    "venueName": "Name des Betriebs",
+    "venueName": "Name des Lokals",
     "fiscalCountry": "Fiskalland",
     "currency": "Währung",
     "defaultLocale": "Standardsprache",
-    "onlinePayments": "Online-Zahlungen",
-    "nexiPaymentsHint": "Nexi XPay für Online-Kartenzahlungen einrichten. Jedes Lokal nutzt sein eigenes Nexi-Konto.",
-    "cardPaymentsDisabledHint": "Online-Zahlungen sind in den allgemeinen Einstellungen deaktiviert.",
+    "onlinePayments": "Kartenzahlung (POS)",
+    "nexiPaymentsHint": "Gäste wählen Karte, das Personal kassiert am POS — wie am Tisch. Kein Nexi-Checkout.",
+    "cardPosHint": "Kein Online-Checkout: die Karte wird am POS des Lokals kassiert.",
+    "cardPosHow": "Karte im Warenkorb ein- oder ausblenden unter",
+    "cardPaymentsDisabledHint": "Kartenzahlungen sind in den allgemeinen Einstellungen deaktiviert.",
     "nexiAlias": "Nexi-Alias",
     "nexiAliasHint": "Händler-Alias von Nexi",
     "nexiSecretKey": "MAC-Geheimschlüssel",
@@ -321,9 +323,11 @@
     "nexiEnvironmentProduction": "Produktion",
     "nexiIncomplete": "Alias und MAC-Schlüssel ausfüllen, um Kartenzahlung im Warenkorb zu aktivieren.",
     "tagline": "Tagline",
+    "taglineHint": "Kurzer Satz unter dem Lokalnamen im QR-Menü und auf Tischschildern.",
     "primaryColor": "Primärfarbe",
     "accentColor": "Akzentfarbe",
     "secondaryColor": "Sekundärfarbe",
+    "secondaryColorHint": "Hervorhebungs-Buttons, Warenkorb-Badge und Kontraste. Die Primärfarbe gilt für Titel, Links und Hauptbuttons.",
     "brandingAssets": "Markenbilder",
     "logo": "Logo",
     "logoHint": "Wird in der Kopfzeile beim Bestellen angezeigt.",

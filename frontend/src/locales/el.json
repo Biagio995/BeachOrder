@@ -82,7 +82,7 @@
     "confirmRemoveMessage": "Να αφαιρεθεί το «{name}» από το καλάθι;",
     "payment": {
       "pay_at_location": "Πληρωμή στον χώρο",
-      "card_online": "Κάρτα online"
+      "card_online": "Κάρτα (POS)"
     }
   },
   "payment": {
@@ -305,13 +305,15 @@
     "settingsPos": "POS",
     "settingsPrinting": "Εκτύπωση παραγγελιών",
     "settingsSubscription": "Συνδρομή",
-    "venueName": "Όνομα επιχείρησης",
+    "venueName": "Όνομα καταστήματος",
     "fiscalCountry": "Χώρα φορολογίας",
     "currency": "Νόμισμα",
     "defaultLocale": "Προεπιλεγμένη γλώσσα",
-    "onlinePayments": "Online πληρωμές",
-    "nexiPaymentsHint": "Ρυθμίστε το Nexi XPay για online πληρωμές με κάρτα. Κάθε κατάστημα χρησιμοποιεί τον δικό του λογαριασμό Nexi.",
-    "cardPaymentsDisabledHint": "Οι online πληρωμές είναι απενεργοποιημένες στις γενικές ρυθμίσεις.",
+    "onlinePayments": "Πληρωμή με κάρτα (POS)",
+    "nexiPaymentsHint": "Ο πελάτης επιλέγει Κάρτα και το προσωπικό εισπράττει στο POS του καταστήματος. Χωρίς Nexi.",
+    "cardPosHint": "Χωρίς online checkout: η κάρτα περνάει στο POS του καταστήματος, όπως στο τραπέζι.",
+    "cardPosHow": "Για εμφάνιση ή απόκρυψη της Κάρτας στο καλάθι, χρησιμοποίησε τον διακόπτη στο",
+    "cardPaymentsDisabledHint": "Η πληρωμή με κάρτα είναι απενεργοποιημένη στις γενικές ρυθμίσεις.",
     "nexiAlias": "Alias Nexi",
     "nexiAliasHint": "Κωδικός εμπόρου από την Nexi",
     "nexiSecretKey": "Μυστικό κλειδί MAC",
@@ -321,9 +323,11 @@
     "nexiEnvironmentProduction": "Παραγωγή",
     "nexiIncomplete": "Συμπληρώστε alias και MAC για να ενεργοποιηθεί η πληρωμή με κάρτα.",
     "tagline": "Tagline",
+    "taglineHint": "Σύντομη φράση κάτω από το όνομα στο μενού QR και στις πινακίδες τραπεζιού.",
     "primaryColor": "Κύριο χρώμα",
     "accentColor": "Δευτερεύον χρώμα",
     "secondaryColor": "Δευτερεύον χρώμα",
+    "secondaryColorHint": "Κουμπιά έμφασης, σήμα καλαθιού και αντιθέσεις. Το κύριο χρώμα είναι τίτλοι, σύνδεσμοι και βασικά κουμπιά.",
     "brandingAssets": "Εικόνες brand",
     "logo": "Λογότυπο",
     "logoHint": "Εμφανίζεται στην κεφαλίδα κατά την παραγγελία.",

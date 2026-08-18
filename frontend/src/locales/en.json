@@ -81,8 +81,8 @@
     "confirmRemoveTitle": "Remove item?",
     "confirmRemoveMessage": "Remove “{name}” from the cart?",
     "payment": {
-      "pay_at_location": "Pay at location",
-      "card_online": "Card online"
+      "pay_at_location": "Pay at the venue",
+      "card_online": "Card (POS)"
     }
   },
   "payment": {
@@ -309,9 +309,11 @@
     "fiscalCountry": "Fiscal country",
     "currency": "Currency",
     "defaultLocale": "Default locale",
-    "onlinePayments": "Online payments",
-    "nexiPaymentsHint": "Configure Nexi XPay to accept online card payments. Each venue uses its own Nexi merchant account.",
-    "cardPaymentsDisabledHint": "Online payments are disabled in general settings.",
+    "onlinePayments": "Card payment (POS)",
+    "nexiPaymentsHint": "Guests choose Card and staff charges the venue POS, like a table payment. No Nexi checkout.",
+    "cardPosHint": "No online checkout: the card is taken on the venue POS, like a table payment.",
+    "cardPosHow": "To show or hide Card in the cart, use the toggle in",
+    "cardPaymentsDisabledHint": "Card payments are disabled in general settings.",
     "nexiAlias": "Nexi alias",
     "nexiAliasHint": "Merchant alias provided by Nexi",
     "nexiSecretKey": "MAC secret key",
@@ -321,9 +323,11 @@
     "nexiEnvironmentProduction": "Production",
     "nexiIncomplete": "Complete alias and MAC key to enable card payment at checkout.",
     "tagline": "Tagline",
+    "taglineHint": "Short line under the venue name on the QR menu and table signs.",
     "primaryColor": "Primary color",
     "accentColor": "Accent color",
     "secondaryColor": "Secondary color",
+    "secondaryColorHint": "Highlight buttons, cart badge and contrast details. Primary is headings, links and main buttons.",
     "brandingAssets": "Brand images",
     "logo": "Logo",
     "logoHint": "Shown in the header during ordering.",

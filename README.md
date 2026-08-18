@@ -145,7 +145,7 @@ Key `.env` values to configure:
 |---|---|
 | `DB_*` | Database connection |
 | `STRIPE_KEY` / `STRIPE_SECRET` / `STRIPE_WEBHOOK_SECRET` | Stripe credentials |
-| `MAIL_*` | Mail driver for OTP codes and notifications |
+| `MAIL_*` | Local test inbox (Mailpit on `:1025` / UI `:8025`) for password reset and new-tenant verification emails |
 | `REVERB_*` | WebSocket server settings |
 | `PRINTNODE_API_KEY` | PrintNode integration (optional) |
 

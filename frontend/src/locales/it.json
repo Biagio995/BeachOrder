@@ -82,7 +82,7 @@
     "confirmRemoveMessage": "Rimuovere “{name}” dal carrello?",
     "payment": {
       "pay_at_location": "Paga in loco",
-      "card_online": "Carta online"
+      "card_online": "Carta (POS)"
     }
   },
   "payment": {
@@ -305,13 +305,15 @@
     "settingsPos": "POS",
     "settingsPrinting": "Stampa ordini",
     "settingsSubscription": "Abbonamento",
-    "venueName": "Nome stabilimento",
+    "venueName": "Nome locale",
     "fiscalCountry": "Paese fiscale",
     "currency": "Valuta",
     "defaultLocale": "Locale default",
-    "onlinePayments": "Pagamenti online",
-    "nexiPaymentsHint": "Configura Nexi XPay per accettare pagamenti con carta online. Ogni stabilimento usa il proprio contratto Nexi.",
-    "cardPaymentsDisabledHint": "I pagamenti online sono disattivati nelle impostazioni generali.",
+    "onlinePayments": "Pagamento con carta (POS)",
+    "nexiPaymentsHint": "Il cliente sceglie Carta e il cameriere incassa sul POS dell'azienda, come in sala. Non serve Nexi.",
+    "cardPosHint": "Nessun checkout online: la carta si passa sul POS dell'azienda, come un pagamento in sala.",
+    "cardPosHow": "Per mostrare o nascondere l'opzione Carta nel carrello, usa l'interruttore in",
+    "cardPaymentsDisabledHint": "Il pagamento con carta è disattivato nelle impostazioni generali.",
     "nexiAlias": "Alias Nexi",
     "nexiAliasHint": "Codice esercente fornito da Nexi",
     "nexiSecretKey": "Chiave MAC",
@@ -321,9 +323,11 @@
     "nexiEnvironmentProduction": "Produzione",
     "nexiIncomplete": "Completa alias e chiave MAC per abilitare il pagamento con carta nel carrello.",
     "tagline": "Tagline",
+    "taglineHint": "Frase sotto il nome del locale nel menu QR e sui cartelli tavolo.",
     "primaryColor": "Colore primario",
     "accentColor": "Colore accent",
     "secondaryColor": "Colore secondario",
+    "secondaryColorHint": "Bottoni di evidenza, badge del carrello e dettagli di contrasto. Il colore primario è titoli, link e bottoni principali.",
     "brandingAssets": "Immagini del brand",
     "logo": "Logo",
     "logoHint": "Mostrato nell'intestazione durante l'ordine.",

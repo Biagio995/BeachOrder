@@ -44,6 +44,14 @@
       "dependsOn": ["Frontend: DevTunnel (5173)"]
     },
     {
+      "label": "Mail: Inbox di test (8025)",
+      "type": "shell",
+      "command": "bash scripts/start-mail-test.sh",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
       "label": "Test: Avvia stack completo",
       "dependsOrder": "parallel",
       "dependsOn": [

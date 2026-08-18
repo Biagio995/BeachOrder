@@ -7,13 +7,17 @@ use Illuminate\Support\Str;
 
 class PaymentService
 {
-    public const METHODS = ['pay_at_location', 'card_online'];
+    public const METHODS = ['pay_at_location'];
 
-    /** @var list<string> */
-    public const ONLINE_METHODS = ['card_online'];
+    /**
+     * Hosted checkout methods (Stripe/Nexi). Empty: card is taken on the venue POS.
+     *
+     * @var list<string>
+     */
+    public const ONLINE_METHODS = [];
 
     /** @var list<string> Legacy Stripe checkout methods kept for existing orders. */
-    public const STRIPE_METHODS = ['card_online', 'apple_pay', 'google_pay'];
+    public const STRIPE_METHODS = ['apple_pay', 'google_pay'];
 
     public function markPending(Order $order, string $method): Order
     {
@@ -29,8 +33,7 @@ class PaymentService
 
     public function isOnlineMethod(?string $method): bool
     {
-        return in_array($method, self::ONLINE_METHODS, true)
-            || in_array($method, self::STRIPE_METHODS, true);
+        return in_array($method, self::ONLINE_METHODS, true);
     }
 
     public function isStripeMethod(?string $method): bool

@@ -121,7 +121,7 @@ class KitchenPrintingTest extends TestCase
         });
     }
 
-    public function test_does_not_print_online_unpaid_orders(): void
+    public function test_prints_unpaid_card_pos_orders(): void
     {
         $order = Order::query()->create([
             'tenant_id' => $this->tenant->id,
@@ -133,11 +133,11 @@ class KitchenPrintingTest extends TestCase
             'subtotal' => 12,
             'total' => 12,
             'payment_method' => 'card_online',
-            'payment_status' => 'pending',
+            'payment_status' => 'unpaid',
         ]);
         $order->setRelation('tenant', $this->tenant);
 
-        $this->assertFalse(app(PrintService::class)->shouldPrintOrder($order));
+        $this->assertTrue(app(PrintService::class)->shouldPrintOrder($order));
     }
 
     public function test_reprint_endpoint_calls_print_service(): void

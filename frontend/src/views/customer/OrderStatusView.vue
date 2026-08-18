@@ -124,7 +124,7 @@ function stepIndex(status: string) {
 }
 
 function isOnlinePayment(method?: string) {
-  return method === 'card_online'
+  return false
 }
 
 function paymentLabel(method?: string) {

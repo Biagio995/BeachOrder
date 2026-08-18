@@ -67,7 +67,7 @@ class Tenant extends Model
     {
         return array_replace_recursive([
             'loyalty_enabled' => true,
-            'online_payments_enabled' => true,
+            'online_payments_enabled' => false,
             'country' => 'IT',
             'nexi' => [
                 'alias' => null,
@@ -181,14 +181,12 @@ class Tenant extends Model
 
     public function onlinePaymentsEnabled(): bool
     {
-        return (bool) $this->setting('online_payments_enabled', true);
+        return false;
     }
 
     public function onlineCardConfigured(): bool
     {
-        $nexi = $this->nexiConfig();
-
-        return filled($nexi['alias'] ?? null) && filled($nexi['secret_key'] ?? null);
+        return false;
     }
 
     /**

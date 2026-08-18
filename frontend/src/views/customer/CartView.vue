@@ -24,20 +24,6 @@ const submitting = ref(false)
 const error = ref('')
 
 const currency = computed(() => menu.tenant?.currency || 'EUR')
-const onlineEnabled = computed(() => menu.tenant?.settings?.online_payments_enabled !== false)
-const cardOnlineEnabled = computed(
-  () => onlineEnabled.value && menu.tenant?.settings?.card_online_available === true,
-)
-
-const isOnlinePayment = (method: string) => method === 'card_online'
-
-const paymentOptions = computed(() => {
-  const options = [{ value: 'pay_at_location', title: t('cart.payment.pay_at_location') }]
-  if (cardOnlineEnabled.value) {
-    options.push({ value: 'card_online', title: t('cart.payment.card_online') })
-  }
-  return options
-})
 
 onMounted(async () => {
   const tenant = String(route.params.tenant || '')
@@ -71,14 +57,13 @@ async function checkout() {
   submitting.value = true
   error.value = ''
   try {
-    const paymentMethod = cart.paymentMethod
     const { data } = await api.post(tenantPath(menu.tenantSlug, '/orders'), {
       location_code: menu.locationCode,
       access_token: menu.accessToken,
       customer_session: menu.session,
       notes: cart.orderNotes || null,
       locale: locale.value,
-      payment_method: cart.paymentMethod,
+      payment_method: 'pay_at_location',
       items: cart.items.map((i) => ({
         product_id: i.product.id,
         quantity: i.quantity,
@@ -93,15 +78,6 @@ async function checkout() {
     cart.clear()
     menu.clearAccess()
     activeOrder.track(data, menu.tenantSlug, menu.session)
-
-    if (isOnlinePayment(paymentMethod)) {
-      router.push({
-        name: 'order-payment',
-        params: { tenant: menu.tenantSlug, id: data.id },
-        query: { session: menu.session },
-      })
-      return
-    }
 
     ui.success(t('order.placed'))
     router.push({
@@ -184,15 +160,6 @@ async function checkout() {
       />
 
       <v-textarea v-model="cart.orderNotes" :label="t('cart.orderNotes')" class="mt-4" rows="2" density="comfortable" />
-      <v-select
-        v-model="cart.paymentMethod"
-        :items="paymentOptions"
-        item-title="title"
-        item-value="value"
-        :label="t('cart.paymentLabel')"
-        class="mb-2"
-        density="comfortable"
-      />
 
       <div class="checkout-bar">
         <div class="d-flex justify-space-between align-center mb-3">
@@ -205,7 +172,7 @@ async function checkout() {
         <v-btn
           block
           size="large"
-          color="accent"
+          color="primary"
           :loading="submitting"
           :disabled="!menu.locationCode || !menu.canOrder"
           @click="checkout"

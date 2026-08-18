@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Tenant;
 use App\Models\User;
 use App\Notifications\OtpCodeNotification;
 use Illuminate\Support\Facades\Cache;
@@ -35,7 +36,7 @@ class OtpService
     /**
      * Send a test OTP to an arbitrary address (no User required).
      */
-    public function sendTest(string $email, string $purpose = self::PURPOSE_TEST): string
+    public function sendTest(string $email, string $purpose = self::PURPOSE_TEST, ?Tenant $tenant = null): string
     {
         $purpose = $this->normalizePurpose($purpose);
         $code = $this->generateAndStore($purpose, $email);
@@ -44,7 +45,7 @@ class OtpService
             ->notify(new OtpCodeNotification(
                 code: $code,
                 purpose: $purpose,
-                tenant: null,
+                tenant: $tenant,
             ));
 
         return $code;

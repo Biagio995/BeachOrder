@@ -30,24 +30,18 @@ class DatabaseSeeder extends Seeder
         $azure = Tenant::query()->updateOrCreate(
             ['slug' => 'azure-beach'],
             [
-                'name' => 'Azure Beach',
+                'name' => 'Pizzeria Bella',
                 'timezone' => 'Europe/Rome',
                 'currency' => 'EUR',
                 'default_locale' => 'it',
                 'branding' => [
                     'primary_color' => '#0B6E6B',
                     'accent_color' => '#E07A5F',
-                    'tagline' => 'Ordina dall\'ombrellone',
+                    'tagline' => 'Ordina dal tavolo',
                 ],
                 'settings' => Tenant::defaultSettings([
                     'loyalty_enabled' => true,
-                    'online_payments_enabled' => true,
                     'country' => 'IT',
-                    'nexi' => [
-                        'alias' => '89590947',
-                        'secret_key' => 'test_secret_key',
-                        'environment' => 'test',
-                    ],
                 ]),
                 'is_active' => true,
                 'is_demo' => true,
@@ -57,24 +51,18 @@ class DatabaseSeeder extends Seeder
         $sunset = Tenant::query()->updateOrCreate(
             ['slug' => 'sunset-lido'],
             [
-                'name' => 'Sunset Lido',
+                'name' => 'Taverna Nikos',
                 'timezone' => 'Europe/Athens',
                 'currency' => 'EUR',
                 'default_locale' => 'el',
                 'branding' => [
                     'primary_color' => '#C45C26',
                     'accent_color' => '#1B6CA8',
-                    'tagline' => 'Παράγγειλε από την ομπρέλα',
+                    'tagline' => 'Παράγγειλε από το τραπέζι',
                 ],
                 'settings' => Tenant::defaultSettings([
                     'loyalty_enabled' => true,
-                    'online_payments_enabled' => true,
                     'country' => 'GR',
-                    'nexi' => [
-                        'alias' => '89590947',
-                        'secret_key' => 'test_secret_key',
-                        'environment' => 'test',
-                    ],
                 ]),
                 'is_active' => true,
                 'is_demo' => true,

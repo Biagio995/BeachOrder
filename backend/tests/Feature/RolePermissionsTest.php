@@ -243,7 +243,7 @@ class RolePermissionsTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_waiter_staff_cannot_mark_online_payment_paid(): void
+    public function test_waiter_staff_can_mark_card_pos_paid(): void
     {
         $location = Location::query()->create([
             'tenant_id' => $this->tenant->id,
@@ -264,7 +264,7 @@ class RolePermissionsTest extends TestCase
             'subtotal' => 10,
             'total' => 10,
             'payment_method' => 'card_online',
-            'payment_status' => 'pending',
+            'payment_status' => 'unpaid',
         ]);
 
         $token = $this->createUser(User::ROLE_STAFF, User::STAFF_POSITION_WAITER)->issueStaffToken();
@@ -272,8 +272,8 @@ class RolePermissionsTest extends TestCase
         $this->withToken($token)
             ->withHeader('X-Tenant', 'test-beach')
             ->patchJson("/api/orders/{$order->id}/payment", ['payment_status' => 'paid'])
-            ->assertUnprocessable()
-            ->assertJsonPath('message', 'Online order payments must be confirmed by the payment provider.');
+            ->assertOk()
+            ->assertJsonPath('payment_status', 'paid');
     }
 
     public function test_me_includes_permissions_and_staff_position(): void

@@ -40,6 +40,27 @@ class OtpServiceTest extends TestCase
         Notification::assertSentOnDemand(\App\Notifications\OtpCodeNotification::class);
     }
 
+    public function test_send_test_can_brand_with_tenant(): void
+    {
+        Notification::fake();
+
+        $tenant = new \App\Models\Tenant([
+            'name' => 'Pizzeria Bella',
+            'slug' => 'mail-test-pizzeria',
+        ]);
+
+        $otp = app(OtpService::class);
+        $otp->sendTest('onboard@servio.test', OtpService::PURPOSE_EMAIL_VERIFICATION, $tenant);
+
+        Notification::assertSentOnDemand(
+            \App\Notifications\OtpCodeNotification::class,
+            function (\App\Notifications\OtpCodeNotification $n) {
+                return $n->purpose === OtpService::PURPOSE_EMAIL_VERIFICATION
+                    && $n->tenant?->slug === 'mail-test-pizzeria';
+            }
+        );
+    }
+
     public function test_max_attempts_invalidates_code(): void
     {
         config(['otp.max_attempts' => 2]);

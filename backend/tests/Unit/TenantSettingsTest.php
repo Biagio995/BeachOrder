@@ -21,7 +21,7 @@ class TenantSettingsTest extends TestCase
         $this->assertFalse($settings['pos']['enabled']);
         $this->assertFalse($settings['printing']['enabled']);
         $this->assertSame(9100, $settings['printing']['stations']['kitchen']['port']);
-        $this->assertTrue($settings['online_payments_enabled']);
+        $this->assertFalse($settings['online_payments_enabled']);
         $this->assertNull($settings['nexi']['alias']);
     }
 

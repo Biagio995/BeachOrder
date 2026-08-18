@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import type { CartAddon, CartItem, CartVariant, Product } from '@/types'
 
-type PaymentMethod = 'pay_at_location' | 'card_online'
+type PaymentMethod = 'pay_at_location'
 
 interface PersistedCart {
   tenantSlug: string
@@ -137,7 +137,7 @@ export const useCartStore = defineStore('cart', () => {
       }))
       customerName.value = data.customerName || ''
       orderNotes.value = data.orderNotes || ''
-      paymentMethod.value = data.paymentMethod === 'card_online' ? 'card_online' : 'pay_at_location'
+      paymentMethod.value = 'pay_at_location'
     } catch {
       items.value = []
     }

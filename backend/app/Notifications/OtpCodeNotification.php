@@ -40,7 +40,7 @@ class OtpCodeNotification extends Notification
             ->line(__('Il codice scade tra :minutes minuti.', ['minutes' => $minutes]))
             ->line(__('Se non hai richiesto tu questa operazione, puoi ignorare questa email.'));
 
-        return TenantMailMessage::apply($mail, $this->tenant);
+        return TenantMailMessage::apply($mail, $this->tenant, platform: true);
     }
 
     private function subject(): string

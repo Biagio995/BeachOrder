@@ -207,11 +207,11 @@ const router = createRouter({
               name: 'admin-settings-general',
               component: () => import('@/views/admin/settings/GeneralSettingsView.vue'),
             },
-            {
-              path: 'payments',
-              name: 'admin-settings-payments',
-              component: () => import('@/views/admin/settings/PaymentSettingsView.vue'),
-            },
+            { path: 'payments', redirect: { name: 'admin-settings-subscription' } },
+            { path: 'pos', redirect: { name: 'admin-settings-general' } },
+            { path: 'pos-integration', redirect: { name: 'admin-settings-general' } },
+            { path: 'pos-mappings', redirect: { name: 'admin-settings-general' } },
+            { path: 'pos-syncs', redirect: { name: 'admin-settings-general' } },
             {
               path: 'appearance',
               name: 'admin-settings-appearance',
@@ -221,26 +221,6 @@ const router = createRouter({
               path: 'fiscal',
               name: 'admin-settings-fiscal',
               component: () => import('@/views/admin/settings/FiscalSettingsView.vue'),
-            },
-            {
-              path: 'pos',
-              name: 'admin-settings-pos',
-              component: () => import('@/views/admin/settings/PosSettingsView.vue'),
-            },
-            {
-              path: 'pos-integration',
-              name: 'admin-settings-pos-integration',
-              component: () => import('@/views/admin/settings/PosIntegrationSettingsView.vue'),
-            },
-            {
-              path: 'pos-mappings',
-              name: 'admin-settings-pos-mappings',
-              component: () => import('@/views/admin/settings/PosMappingView.vue'),
-            },
-            {
-              path: 'pos-syncs',
-              name: 'admin-settings-pos-syncs',
-              component: () => import('@/views/admin/settings/PosSyncLogView.vue'),
             },
             {
               path: 'printing',

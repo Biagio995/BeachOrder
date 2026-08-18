@@ -73,7 +73,7 @@ const emptyPayload = (): TenantSettingsPayload => ({
     menu_header_url: null,
   },
   settings: {
-    online_payments_enabled: true,
+    online_payments_enabled: false,
     country: 'IT',
     nexi: {
       alias: '',
@@ -123,7 +123,7 @@ function mapResponse(data: Record<string, any>): TenantSettingsPayload {
       menu_header_url: resolvePublicAssetUrl(data.branding?.menu_header_url) || null,
     },
     settings: {
-      online_payments_enabled: s.online_payments_enabled ?? true,
+      online_payments_enabled: false,
       country: (s.country || 'IT').toUpperCase(),
       nexi: {
         alias: s.nexi?.alias || '',
@@ -196,11 +196,8 @@ function syncTenantStores(mapped: TenantSettingsPayload) {
       default_locale: mapped.default_locale,
       branding: { ...mapped.branding },
       settings: {
-        online_payments_enabled: mapped.settings.online_payments_enabled,
-        card_online_available:
-          mapped.settings.online_payments_enabled
-          && mapped.settings.nexi.alias.trim() !== ''
-          && mapped.settings.nexi.secret_key.trim() !== '',
+        online_payments_enabled: false,
+        card_online_available: false,
       },
     }
   }

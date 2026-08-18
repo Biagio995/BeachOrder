@@ -15,7 +15,6 @@ use App\Services\PaymentService;
 use App\Services\Pos\PosOrderSyncService;
 use App\Services\Printing\PrintService;
 use App\Services\ProductCustomizationService;
-use App\Services\NexiXPayService;
 use App\Services\StripeOrderPaymentService;
 use App\Support\LocalizedText;
 use App\Support\RolePermissions;
@@ -25,7 +24,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
@@ -34,7 +32,6 @@ class OrderController extends Controller
         private PaymentService $payments,
         private LocationAccessService $locationAccess,
         private ProductCustomizationService $customizations,
-        private StripeOrderPaymentService $stripePayments,
         private PrintService $printing,
         private PosOrderSyncService $posSync,
     ) {}
@@ -65,20 +62,6 @@ class OrderController extends Controller
 
         $tenant = TenantContext::get();
         $method = $data['payment_method'] ?? 'pay_at_location';
-
-        if ($method === 'card_online') {
-            if (! $tenant?->onlinePaymentsEnabled()) {
-                throw ValidationException::withMessages([
-                    'payment_method' => ['Online payments are disabled for this venue.'],
-                ]);
-            }
-
-            if (! $tenant?->onlineCardConfigured()) {
-                throw ValidationException::withMessages([
-                    'payment_method' => ['Card payments are not configured for this venue.'],
-                ]);
-            }
-        }
 
         $location = Location::query()
             ->where('code', $data['location_code'])
@@ -213,9 +196,7 @@ class OrderController extends Controller
             }
 
             $payload = $order->toArray();
-            $payload['payment_receipt'] = $order->payment_method === 'card_online'
-                ? app(NexiXPayService::class)->receiptFor($order)
-                : app(StripeOrderPaymentService::class)->receiptFor($order);
+            $payload['payment_receipt'] = null;
 
             return response()->json($payload);
         }
@@ -227,7 +208,7 @@ class OrderController extends Controller
     {
         $query = Order::query()->with(['items', 'location'])->latest();
 
-        // Online orders reach kitchen/bar only after payment is confirmed.
+        // Hosted-checkout orders reach kitchen/bar only after payment is confirmed.
         $query->where(function ($builder) {
             $builder->whereNotIn('payment_method', PaymentService::ONLINE_METHODS)
                 ->orWhere('payment_status', 'paid');

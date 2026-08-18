@@ -10,13 +10,8 @@ const { load, loading } = useTenantSettings()
 const links = computed(() => [
   { to: '/admin/settings/subscription', label: t('admin.settingsSubscription') },
   { to: '/admin/settings/general', label: t('admin.settingsGeneral') },
-  { to: '/admin/settings/payments', label: t('admin.settingsPayments') },
   { to: '/admin/settings/appearance', label: t('admin.settingsAppearance') },
   { to: '/admin/settings/fiscal', label: t('admin.settingsFiscal') },
-  { to: '/admin/settings/pos', label: t('admin.settingsPos') },
-  { to: '/admin/settings/pos-integration', label: t('admin.settingsPosIntegration') },
-  { to: '/admin/settings/pos-mappings', label: t('admin.posMappingTitle') },
-  { to: '/admin/settings/pos-syncs', label: t('admin.posSyncLogTitle') },
   { to: '/admin/settings/printing', label: t('admin.settingsPrinting') },
   { to: '/admin/settings/privacy', label: t('legal.privacySettings') },
 ])
