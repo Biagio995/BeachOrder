@@ -17,7 +17,7 @@ fi
 echo "==> Hosting porta $PORT (anonimo, descrizione: Servio demo)"
 echo
 echo "Prima di avviare il tunnel:"
-echo "  1. bash scripts/start-test-env.sh   (backend :8000 + frontend :5173)"
+echo "  1. bash scripts/start-test-env.sh   (backend :8001 + frontend :5173)"
 echo "     oppure npm run dev:tunnel nella cartella frontend + php artisan serve"
 echo "  2. Copia l'URL https://...devtunnels.ms che apparirà sotto"
 echo "  3. In backend/.env imposta:"

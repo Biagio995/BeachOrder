@@ -4,9 +4,9 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "==> Backend Laravel (porta 8000)"
+echo "==> Backend Laravel (porta 8001)"
 cd "$ROOT/backend"
-php artisan serve --host=0.0.0.0 --port=8000 &
+php artisan serve --host=0.0.0.0 --port=8001 &
 BACKEND_PID=$!
 
 echo "==> WebSocket Reverb (porta 8080)"
