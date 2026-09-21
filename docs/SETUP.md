@@ -91,6 +91,54 @@ Senza Docker: `MAIL_MAILER=log` e leggi `backend/storage/logs/laravel.log`.
 4. Cameriere: login `waiter@servio.test` → `/waiter`
 5. Admin: `admin@servio.test` → `/admin` (prezzi, QR, utenti)
 
+## Deploy produzione (Dockerfile)
+
+Il repo include un’immagine all-in-one (frontend Vue + API Laravel + queue + Reverb + scheduler) dietro nginx sulla porta **80**.
+
+### File rilevanti
+
+| File | Ruolo |
+|---|---|
+| `Dockerfile` | Build multi-stage produzione |
+| `docker-compose.prod.yml` | App + Postgres + Redis (test locale o VPS) |
+| `.env.production.example` | Template variabili runtime |
+| `docker/` | nginx, supervisord, entrypoint, php.ini |
+
+### Hosting che chiede solo un Dockerfile
+
+1. Punta il builder alla root del repo (`Dockerfile`).
+2. Espone la porta **80**.
+3. Configura le variabili d’ambiente (minimo): `APP_KEY`, `APP_URL`, `FRONTEND_URL`, `DB_*`, `REDIS_*` (se usi Redis), `REVERB_*`, mail e Stripe.
+4. Genera la chiave: `php artisan key:generate --show` (in locale) e incollala in `APP_KEY`.
+5. `APP_URL` e `FRONTEND_URL` devono essere l’URL pubblico HTTPS del sito (stesso origin).
+6. Il database Postgres/Redis va fornito dall’host (managed) oppure con `docker-compose.prod.yml`.
+
+### Test locale dell’immagine
+
+```bash
+# dalla root del repo
+cp .env.production.example .env.production
+# compila APP_KEY, password DB, URL (es. http://localhost:8080)
+
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+App: [http://localhost:8080](http://localhost:8080)  
+Health: [http://localhost:8080/up](http://localhost:8080/up) e `/api/health`
+
+Primo avvio con dati demo:
+
+```bash
+RUN_SEEDERS=true docker compose -f docker-compose.prod.yml up -d
+```
+
+### Note
+
+- Le migration partono all’avvio (`RUN_MIGRATIONS=true` di default).
+- WebSocket Reverb è in proxy su `/app` (come in Vite dev): lascia `VITE_REVERB_USE_PROXY=true` nel build.
+- Storage persistente: volume `servio_storage` (compose) oppure volume montato su `/var/www/html/storage/app`.
+- TLS termina di solito sul reverse proxy dell’host (Coolify, Traefik, nginx del provider): l’app ascolta HTTP sulla 80.
+
 ## Sicurezza MVP
 
 - Rate limiting su login, ordini, waiter-call

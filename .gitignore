@@ -6,6 +6,7 @@ backend/vendor/
 backend/node_modules/
 backend/.env
 frontend/.env
+.env.production
 backend/database/*.sqlite
 backend/storage/logs/*
 backend/storage/framework/cache/*
