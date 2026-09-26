@@ -43,6 +43,14 @@ export function getEcho(): Echo<'reverb'> {
       key: import.meta.env.VITE_REVERB_APP_KEY,
       ...reverbTransport(),
       enabledTransports: ['ws', 'wss'],
+      // Auto-reconnect after Render Free sleep / brief network blips.
+      // Pusher-js retries with backoff; activityTimeout must exceed nginx
+      // proxy idle cuts so heartbeats keep the board sockets alive.
+      disableStats: true,
+      enableLogging: false,
+      activityTimeout: 30000,
+      pongTimeout: 15000,
+      unavailableTimeout: 10000,
       authEndpoint: `${import.meta.env.VITE_API_URL || '/api'}/broadcasting/auth`,
       auth: {
         headers: {

@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import api, { getApiErrorMessage, tenantPath } from '@/api/client'
 import { useMenuStore } from '@/stores/menu'
-import { useUiStore } from '@/stores/ui'
 import ServiceUnavailable from '@/components/customer/ServiceUnavailable.vue'
 import { formatMoney } from '@/utils/money'
 
@@ -23,7 +22,6 @@ const route = useRoute()
 const router = useRouter()
 const { t, locale } = useI18n()
 const menu = useMenuStore()
-const ui = useUiStore()
 
 const loading = ref(true)
 const redirecting = ref(false)

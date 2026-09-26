@@ -7,6 +7,7 @@ use App\Models\OrderPrintLog;
 use App\Models\Tenant;
 use App\Services\AuditLogger;
 use App\Services\PaymentService;
+use App\Support\DemoMode;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use RuntimeException;
@@ -22,6 +23,12 @@ class PrintService
 
     public function shouldPrintOrder(Order $order): bool
     {
+        // Demo kill-switch: printers stay off unless explicitly enabled, so
+        // the public demo never attempts a TCP/printer connection.
+        if (DemoMode::enabled() && ! DemoMode::printersEnabled()) {
+            return false;
+        }
+
         $tenant = $order->tenant ?? Tenant::query()->find($order->tenant_id);
         if (! $tenant || ! $tenant->printingEnabled()) {
             return false;
@@ -62,6 +69,10 @@ class PrintService
      */
     public function printStation(Order $order, string $station, bool $reprint = false): OrderPrintLog
     {
+        if (DemoMode::enabled() && ! DemoMode::printersEnabled()) {
+            throw new RuntimeException('Printing is disabled in demo mode.');
+        }
+
         if (! in_array($station, Order::STATIONS, true)) {
             throw new InvalidArgumentException("Invalid station: {$station}");
         }
@@ -156,6 +167,10 @@ class PrintService
      */
     public function printTest(Tenant $tenant, string $station): array
     {
+        if (DemoMode::enabled() && ! DemoMode::printersEnabled()) {
+            throw new RuntimeException('Printing is disabled in demo mode.');
+        }
+
         if (! in_array($station, Order::STATIONS, true)) {
             throw new InvalidArgumentException("Invalid station: {$station}");
         }
