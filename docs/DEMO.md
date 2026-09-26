@@ -5,22 +5,30 @@ Un **singolo container** esegue web app PHP, Reverb, queue worker e scheduler, d
 **una sola porta** (`$PORT`), con SQLite su volume. Non serve fare deploy da qui:
 questa guida prepara build, env e QR; il deploy lo fa chi ha accesso all'host.
 
+Il nome pubblico del prodotto è **Servio**: in demo non compare mai “Beach Order”
+(verificato con ricerca su tutto il repo: zero occorrenze; branding, titoli, email OTP
+e UI dicono Servio; la testata mostra il nome del locale dimostrativo “Lido Azzurra”,
+come da white-label).
+
 ## 1. Cosa contiene la demo
 
 - `DemoSeeder` (`backend/database/seeders/DemoSeeder.php`) — eseguibile da solo e
   idempotente (`php artisan db:seed --class=DemoSeeder`):
   - **un solo locale inventato**: “Lido Azzurra” (slug `lido-azzurra`), beach bar/lido,
     nessun dato di attività reali;
-  - menu italiano in **4 categorie, 16 prodotti** con prezzi realistici, **4 gruppi
+  - menu in **4 categorie, 16 prodotti** con prezzi realistici, **4 gruppi
     varianti** (es. farcitura cornetto, base poké, formato spritz, pane) e
-    **4 gruppi aggiunte** (extra club sandwich, insalata, cappuccino, mojito);
+    **4 gruppi aggiunte** (extra club sandwich, insalata, cappuccino, mojito),
+    **tutti tradotti nelle 4 lingue supportate dall'app (it, en, de, el)** con le
+    stesse mappe JSON usate dal catalogo reale (nomi, descrizioni, varianti, aggiunte, tag);
   - **8 postazioni** con QR stabile (`umbrella01…06`, `table01…02`);
   - **3 utenti**: admin del locale, staff cucina, staff sala — password da env
     (vedi sotto), mai scritte in chiaro.
 - `php artisan demo:export-qr` — un PNG per postazione (`ombrellone-01.png`, …).
 - `php artisan demo:check [--fail]` — verifica la modalità demo sicura.
-- `DEMO_MODE=true` — Stripe solo test, stampanti/POS spenti, Nexi solo sandbox,
-  traduzione automatica disattivata (il menu demo è curato in italiano).
+- `DEMO_MODE=true` — pagamenti online spenti, stampanti/POS spenti, carte
+  eventualmente configurate confinate in sandbox, traduzione automatica
+  disattivata (il menu demo è curato nelle 4 lingue).
 
 ## 2. Variabili d'ambiente
 
@@ -39,10 +47,8 @@ File di esempio: `.env.demo.example` (copiare in `.env.demo`, **mai committare i
 | `DEMO_ADMIN_PASSWORD` / `DEMO_STAFF_PASSWORD` / `DEMO_WAITER_PASSWORD` | **sì in produzione** | `password` **solo se `APP_ENV=local`** | fuori da `local`, se mancano vengono generate random e stampate nel log |
 | `DEMO_QR_OUTPUT` | no | `storage/app/demo-qr` | cartella PNG del comando export |
 | `DEMO_PRINTERS_ENABLED` / `DEMO_POS_ENABLED` | no | `false` | restano `false` sulla demo pubblica |
-| `STRIPE_KEY` / `STRIPE_SECRET` | no | vuote | solo chiavi `sk_test_*` / `pk_test_*`; con `DEMO_MODE=true` le chiavi live **bloccano l'avvio** |
-| `DB_CONNECTION` / `DB_DATABASE` | no | `sqlite` / `/data/demo.sqlite` | Postgres via `DB_CONNECTION=pgsql` + `DB_HOST/DB_PORT/DB_DATABASE/DB_USERNAME/DB_PASSWORD` |
-| `REVERB_APP_KEY` / `REVERB_APP_SECRET` | sì | — | se cambi `REVERB_APP_KEY`, **ricostruisci l'immagine** (è compilata nel frontend) |
 | `TRANSLATION_AUTO` | no | `false` (consigliato in demo) | in demo è comunque forzato off |
+| Stripe / chiavi pagamento | — | — | **non servono**: i pagamenti online sono spenti a livello di prodotto |
 
 ## 3. Build e avvio
 
@@ -53,9 +59,9 @@ docker compose -f docker-compose.demo.yml --env-file .env.demo up -d --build
 
 All'avvio il container, in ordine: rende il template nginx su `$PORT`, prepara
 SQLite su `/data/demo.sqlite`, `migrate --force`, seed demo se `DEMO_SEED=true`,
-`demo:check --fail` se `DEMO_MODE=true` (si rifiuta di partire con chiavi live),
-cache di config/route/view, poi supervisord (php-fpm, nginx, queue, **Reverb su
-porta interna 6001**, scheduler).
+`demo:check --fail` se `DEMO_MODE=true` (si rifiuta di partire con configurazione
+demo non sicura), cache di config/route/view, poi supervisord (php-fpm, nginx,
+queue, **Reverb su porta interna 6001**, scheduler).
 
 Dietro un proxy TLS (o host PaaS) basta esporre `$PORT` in HTTPS: API (`/api`),
 WebSocket Reverb (`/app`, `/apps`) e SPA sono sulla **stessa origine**
@@ -84,35 +90,59 @@ del tenant. **Se cambia l'URL pubblico, i QR vanno rigenerati e ristampati.**
 
 ## 5. Flusso demo (per le riprese)
 
-1. Cliente: scansiona QR → menu → carrello (variante/aggiunta) → ordine
-   `pay_at_location` → pagina stato (si aggiorna da sola via Reverb).
-2. Chiamata cameriere dal menu (`/call-waiter`).
-3. Staff: login cucina (`/kitchen`) → board live → avanza stati
-   `received → accepted → preparing → ready`; sala (`/waiter-calls`) → prese in carico.
+1. Cliente: scansiona QR → menu → selettore lingua (IT/EN/DE/EL) → carrello
+   (variante/aggiunta) → ordine → pagina stato (si aggiorna da sola via Reverb).
+   Si paga al locale: nessuna proposta di pagamento online in UI.
+2. Chiamata cameriere dal menu (`/call-waiter`, con motivo: Conto, Acqua, …).
+3. Staff: login cucina (`/kitchen`) e bar (`/bar`) → board live distinte per
+   reparto → avanza stati `received → accepted → preparing → ready`;
+   sala (`/waiter`) → chiamate con motivo visibile.
 4. Admin: back-office menu/postazioni/utenti (`/admin`).
 
-## 6. Cosa non funziona / limiti in demo (onesto)
+## 6. Report funzioni — verificato sull'app in esecuzione
 
-- **Pagamenti online disattivati**: il tenant demo ha `online_payments_enabled=false`;
-  il checkout è “paga alla cassa”. Stripe accetta solo chiavi test e comunque
-  nessun metodo carta è esposto al cliente demo; Nexi resta confinato alla
-  sandbox. Verificato solo fino al checkout + ricevuta “not an online order”.
+Ambiente di verifica: backend Laravel + Reverb + frontend Vite avviati in locale,
+stesso seed della demo; controlli eseguiti **nel browser** (screenshot) e via API.
+
+- **(a) Menu tradotto nelle 4 lingue lato cliente con selettore funzionante — SÌ.**
+  Evidenza: selettore bandiere IT/EN/DE/EL nella app bar; dopo ogni cambio il menu
+  si ricarica tradotto — IT “Caffetteria e colazioni / Cornetto artigianale”,
+  EN “Coffee & breakfast / Croissant”, DE “Kaffee & Frühstück”, EL “Καφές & πρωινό /
+  Κρουασάν” (anche varianti/aggiunte, es. “Formato/Size/Größe/Μέγεθος”).
+  Via API: `GET /api/t/lido-azzurra/menu?locale={it,en,de,el}` 200 in <0.3 s.
+- **(b) Ordini smistati su schermi separati cucina e bar — SÌ.**
+  Evidenza: route distinte `/kitchen` e `/bar` (stessa board filtrata per reparto);
+  su un ordine misto la board cucina mostra solo “1× Club sandwich”
+  (ordine BO-260926-EMAZI, Ombrellone 03) e la board bar solo “1× Spritz Aperol”.
+- **(c) Chiamata cameriere con motivo visibile allo staff — SÌ.**
+  Evidenza: pagina cliente con motivi (Conto, Acqua, Assistenza, …); inviando
+  “Conto” da Ombrellone 01, la board sala mostra la chiamata “in attesa” con
+  motivo visibile (“Λογαριασμός” con UI in greco). Nota: la pagina
+  `/call-waiter` richiede il contesto postazione (va aperta dopo il menu via QR).
+
+## 7. Cosa non funziona / limiti in demo (onesto)
+
+- **Pagamenti online spenti**: disattivati a livello di prodotto dal 18/08
+  (`PaymentService::ONLINE_METHODS` vuoto, `online_payments_enabled=false`);
+  il checkout è “paga al locale” e nessuna UI propone carte/online. Nessuna env
+  di pagamento serve per la demo.
 - **Stampanti e POS spenti**: nessun tentativo di connessione TCP/esterna
   (`demo:check` lo conferma; il test stampa risponde “Printing is disabled in
   demo mode”). Scontrini fiscali e invii POS non avvengono.
-- **Traduzione automatica spenta**: nomi/descrizioni solo in italiano (curati nel
-  seeder); le altre lingue dell'UI vedono l'italiano come fallback.
+- **Traduzione automatica spenta**: testi curati nel seeder nelle 4 lingue;
+  nessun contenuto generato a runtime, nessuna dipendenza HTTP esterna nel menu.
 - **SQLite**: perfetto per riprese e traffico demo, ma niente concorrenza
   elevata; backup = snapshot del volume `/data`. Postgres supportato via env.
 - **Una sola istanza**: Reverb e code sono in-container; non scalare a N repliche
   (i WS devono restare sullo stesso nodo).
-- **Mail finta**: nessun invio reale (impostare `MAIL_*` se servono OTP/reset).
+- **Mail finta**: nessun invio reale (impostare `MAIL_*` se servono OTP/reset;
+  l'oggetto OTP dice comunque “Servio — …”).
 - **Login throttling**: 10 tentativi/min su `/login` — nelle prove ravvicinate si
   prende 429, è normale.
 - **Abbonamenti/billing, backup schedulati, POS mapping, analytics avanzate**:
   presenti nel codice ma fuori perimetro demo. Il tenant demo (`is_demo=true`)
   è esente dal gate abbonamento, quindi tutte le rotte staff/admin del §5
-  funzionano senza Stripe.
+  funzionano senza pagamenti.
 - **Chiave Reverb compilata nel frontend**: cambio `REVERB_APP_KEY` = rebuild.
 - **Credenziali demo**: sono utenze dimostrative con password condivise al team
   video — ruotarle dopo la campagna e non riusarle in produzione.

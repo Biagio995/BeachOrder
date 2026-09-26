@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Subscription;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Support\DemoMode;
 use Stripe\Checkout\Session as CheckoutSession;
 use Stripe\Exception\ApiErrorException;
 use Stripe\StripeClient;
@@ -21,16 +20,7 @@ class StripeSubscriptionService
 
     public function isConfigured(): bool
     {
-        if (! filled(config('billing.stripe.secret')) || ! filled(config('billing.stripe.price_annual'))) {
-            return false;
-        }
-
-        // Demo safety: live Stripe keys are treated as "not configured".
-        if (DemoMode::enabled() && ! DemoMode::stripeKeysAreTestOnly()) {
-            return false;
-        }
-
-        return true;
+        return filled(config('billing.stripe.secret')) && filled(config('billing.stripe.price_annual'));
     }
 
     public function client(): StripeClient

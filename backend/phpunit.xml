@@ -31,5 +31,7 @@
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="MONITORING_FRONTEND_CHECK" value="false"/>
+        <env name="DEMO_MODE" value="false"/>
+        <env name="TRANSLATION_AUTO" value="true"/>
     </php>
 </phpunit>

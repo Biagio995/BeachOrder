@@ -21,8 +21,10 @@ use Illuminate\Support\Facades\Hash;
  * Public demo venue for the video campaign.
  *
  * Standalone + idempotent: `php artisan db:seed --class=DemoSeeder`.
- * Creates exactly ONE invented venue (no real business data) with an Italian
- * beach-bar menu, QR-coded spots and demo staff users.
+ * Creates exactly ONE invented venue (no real business data) with a beach-bar
+ * menu in the 4 locales supported by the app (it, en, de, el — stored as JSON
+ * maps, exactly like admin-maintained catalog text), QR-coded spots and demo
+ * staff users.
  */
 class DemoSeeder extends Seeder
 {
@@ -166,10 +168,10 @@ class DemoSeeder extends Seeder
     private function seedTags(Tenant $tenant): array
     {
         $defs = [
-            'vegetariano' => ['it' => 'Vegetariano', 'en' => 'Vegetarian'],
-            'vegano' => ['it' => 'Vegano', 'en' => 'Vegan'],
-            'senza-glutine' => ['it' => 'Senza glutine', 'en' => 'Gluten free'],
-            'piccante' => ['it' => 'Piccante', 'en' => 'Spicy'],
+            'vegetariano' => ['it' => 'Vegetariano', 'en' => 'Vegetarian', 'de' => 'Vegetarisch', 'el' => 'Χορτοφαγικό'],
+            'vegano' => ['it' => 'Vegano', 'en' => 'Vegan', 'de' => 'Vegan', 'el' => 'Βίγκαν'],
+            'senza-glutine' => ['it' => 'Senza glutine', 'en' => 'Gluten free', 'de' => 'Glutenfrei', 'el' => 'Χωρίς γλουτένη'],
+            'piccante' => ['it' => 'Piccante', 'en' => 'Spicy', 'de' => 'Scharf', 'el' => 'Πικάντικο'],
         ];
 
         $tags = [];
@@ -197,23 +199,23 @@ class DemoSeeder extends Seeder
     {
         $categories = [
             'caffetteria' => [
-                'name' => ['it' => 'Caffetteria e colazioni', 'en' => 'Coffee & breakfast'],
-                'description' => ['it' => 'Per iniziare la giornata in spiaggia', 'en' => 'Start your beach day'],
+                'name' => ['it' => 'Caffetteria e colazioni', 'en' => 'Coffee & breakfast', 'de' => 'Kaffee & Frühstück', 'el' => 'Καφές & πρωινό'],
+                'description' => ['it' => 'Per iniziare la giornata in spiaggia', 'en' => 'Start your beach day', 'de' => 'Für den Start in den Strandtag', 'el' => 'Για να ξεκινήσει η μέρα στην παραλία'],
                 'sort_order' => 1,
             ],
             'panini-piadine' => [
-                'name' => ['it' => 'Panini e piadine', 'en' => 'Sandwiches & piadine'],
-                'description' => ['it' => 'Fatti al momento, pane fresco ogni giorno', 'en' => 'Made fresh daily'],
+                'name' => ['it' => 'Panini e piadine', 'en' => 'Sandwiches & piadine', 'de' => 'Panini & Piadine', 'el' => 'Πανίνι & πιαντίνες'],
+                'description' => ['it' => 'Fatti al momento, pane fresco ogni giorno', 'en' => 'Made fresh daily', 'de' => 'Täglich frisch belegt', 'el' => 'Φρέσκα, φτιαγμένα καθημερινά'],
                 'sort_order' => 2,
             ],
             'insalate-poke' => [
-                'name' => ['it' => 'Insalate e poké', 'en' => 'Salads & poké'],
-                'description' => ['it' => 'Fresche, leggere e colorate', 'en' => 'Fresh, light and colorful'],
+                'name' => ['it' => 'Insalate e poké', 'en' => 'Salads & poké', 'de' => 'Salate & Poké', 'el' => 'Σαλάτες & πόκε'],
+                'description' => ['it' => 'Fresche, leggere e colorate', 'en' => 'Fresh, light and colorful', 'de' => 'Frisch, leicht und bunt', 'el' => 'Φρέσκες, ελαφριές και πολύχρωμες'],
                 'sort_order' => 3,
             ],
             'bibite-cocktail' => [
-                'name' => ['it' => 'Bibite e cocktail', 'en' => 'Drinks & cocktails'],
-                'description' => ['it' => 'Ghiacciate, dal bar alla sdraio', 'en' => 'Ice-cold, from bar to sunbed'],
+                'name' => ['it' => 'Bibite e cocktail', 'en' => 'Drinks & cocktails', 'de' => 'Getränke & Cocktails', 'el' => 'Ποτά & κοκτέιλ'],
+                'description' => ['it' => 'Ghiacciate, dal bar alla sdraio', 'en' => 'Ice-cold, from bar to sunbed', 'de' => 'Eiskalt, von der Bar an die Liege', 'el' => 'Παγωμένα, από το μπαρ στην ξαπλώστρα'],
                 'sort_order' => 4,
             ],
         ];
@@ -231,194 +233,194 @@ class DemoSeeder extends Seeder
             // Caffetteria
             [
                 'slug' => 'espresso', 'category' => 'caffetteria', 'station' => 'bar',
-                'name' => ['it' => 'Espresso', 'en' => 'Espresso'],
-                'description' => ['it' => 'Miscela della casa, tazzina calda', 'en' => 'House blend'],
+                'name' => ['it' => 'Espresso', 'en' => 'Espresso', 'de' => 'Espresso', 'el' => 'Εσπρέσο'],
+                'description' => ['it' => 'Miscela della casa, tazzina calda', 'en' => 'House blend', 'de' => 'Hausmischung, heiße Tasse', 'el' => 'Χαρμάνι του σπιτιού, ζεστό φλιτζάνι'],
                 'price' => 1.20, 'sort_order' => 1, 'tags' => ['vegano', 'senza-glutine'],
             ],
             [
                 'slug' => 'cappuccino', 'category' => 'caffetteria', 'station' => 'bar',
-                'name' => ['it' => 'Cappuccino', 'en' => 'Cappuccino'],
-                'description' => ['it' => 'Schiuma densa, spolverata di cacao', 'en' => 'Thick foam, cocoa dust'],
+                'name' => ['it' => 'Cappuccino', 'en' => 'Cappuccino', 'de' => 'Cappuccino', 'el' => 'Καπουτσίνο'],
+                'description' => ['it' => 'Schiuma densa, spolverata di cacao', 'en' => 'Thick foam, cocoa dust', 'de' => 'Dichter Milchschaum mit Kakao', 'el' => 'Πυκνός αφρός γάλακτος με κακάο'],
                 'price' => 1.80, 'sort_order' => 2, 'tags' => ['vegetariano'],
                 'addon_groups' => [
                     [
-                        'name' => ['it' => 'Latte ed extra', 'en' => 'Milk & extras'],
+                        'name' => ['it' => 'Latte ed extra', 'en' => 'Milk & extras', 'de' => 'Milch & Extras', 'el' => 'Γάλα & έξτρα'],
                         'addons' => [
-                            ['name' => ['it' => 'Latte di soia', 'en' => 'Soy milk'], 'price' => 0.50],
-                            ['name' => ['it' => 'Panna montata', 'en' => 'Whipped cream'], 'price' => 1.00],
-                            ['name' => ['it' => 'Cacao extra', 'en' => 'Extra cocoa'], 'price' => 0.30],
+                            ['name' => ['it' => 'Latte di soia', 'en' => 'Soy milk', 'de' => 'Sojamilch', 'el' => 'Γάλα σόγιας'], 'price' => 0.50],
+                            ['name' => ['it' => 'Panna montata', 'en' => 'Whipped cream', 'de' => 'Schlagsahne', 'el' => 'Σαντιγί'], 'price' => 1.00],
+                            ['name' => ['it' => 'Cacao extra', 'en' => 'Extra cocoa', 'de' => 'Extra Kakao', 'el' => 'Έξτρα κακάο'], 'price' => 0.30],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'cornetto', 'category' => 'caffetteria', 'station' => 'bar',
-                'name' => ['it' => 'Cornetto artigianale', 'en' => 'Croissant'],
-                'description' => ['it' => 'Sfoglia burrosa, sfornato ogni mattina', 'en' => 'Buttery, baked every morning'],
+                'name' => ['it' => 'Cornetto artigianale', 'en' => 'Croissant', 'de' => 'Croissant', 'el' => 'Κρουασάν'],
+                'description' => ['it' => 'Sfoglia burrosa, sfornato ogni mattina', 'en' => 'Buttery, baked every morning', 'de' => 'Buttrig, jeden Morgen frisch gebacken', 'el' => 'Βουτυρένιο, φρέσκο κάθε πρωί'],
                 'price' => 1.60, 'sort_order' => 3, 'tags' => ['vegetariano'],
                 'variant_groups' => [
                     [
-                        'name' => ['it' => 'Farcitura', 'en' => 'Filling'],
+                        'name' => ['it' => 'Farcitura', 'en' => 'Filling', 'de' => 'Füllung', 'el' => 'Γέμιση'],
                         'is_required' => true,
                         'options' => [
-                            ['name' => ['it' => 'Vuoto', 'en' => 'Plain'], 'price' => 0.00],
-                            ['name' => ['it' => 'Crema', 'en' => 'Custard'], 'price' => 0.50],
-                            ['name' => ['it' => 'Marmellata di albicocche', 'en' => 'Apricot jam'], 'price' => 0.50],
-                            ['name' => ['it' => 'Nutella', 'en' => 'Nutella'], 'price' => 0.70],
+                            ['name' => ['it' => 'Vuoto', 'en' => 'Plain', 'de' => 'Pur', 'el' => 'Σκέτο'], 'price' => 0.00],
+                            ['name' => ['it' => 'Crema', 'en' => 'Custard', 'de' => 'Vanillecreme', 'el' => 'Κρέμα'], 'price' => 0.50],
+                            ['name' => ['it' => 'Marmellata di albicocche', 'en' => 'Apricot jam', 'de' => 'Aprikosenmarmelade', 'el' => 'Μαρμελάδα βερίκοκο'], 'price' => 0.50],
+                            ['name' => ['it' => 'Nutella', 'en' => 'Nutella', 'de' => 'Nutella', 'el' => 'Nutella'], 'price' => 0.70],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'caffe-shakerato', 'category' => 'caffetteria', 'station' => 'bar',
-                'name' => ['it' => 'Caffè shakerato', 'en' => 'Iced shaken coffee'],
-                'description' => ['it' => 'Shakerato con ghiaccio, dolce e cremoso', 'en' => 'Shaken with ice'],
+                'name' => ['it' => 'Caffè shakerato', 'en' => 'Iced shaken coffee', 'de' => 'Geshakter Eiskaffee', 'el' => 'Σεϊκαρισμένος καφές'],
+                'description' => ['it' => 'Shakerato con ghiaccio, dolce e cremoso', 'en' => 'Shaken with ice', 'de' => 'Mit Eis geshakt, süß und cremig', 'el' => 'Χτυπημένος με πάγο, γλυκός και κρεμώδης'],
                 'price' => 3.50, 'sort_order' => 4, 'tags' => ['vegetariano', 'senza-glutine'],
             ],
             // Panini e piadine
             [
                 'slug' => 'club-sandwich', 'category' => 'panini-piadine', 'station' => 'kitchen',
-                'name' => ['it' => 'Club sandwich', 'en' => 'Club sandwich'],
-                'description' => ['it' => 'Pollo grigliato, lattuga, pomodoro, maionese', 'en' => 'Grilled chicken, lettuce, tomato, mayo'],
+                'name' => ['it' => 'Club sandwich', 'en' => 'Club sandwich', 'de' => 'Clubsandwich', 'el' => 'Κλαμπ σάντουιτς'],
+                'description' => ['it' => 'Pollo grigliato, lattuga, pomodoro, maionese', 'en' => 'Grilled chicken, lettuce, tomato, mayo', 'de' => 'Gegrilltes Hähnchen, Salat, Tomate, Mayo', 'el' => 'Ψητό κοτόπουλο, μαρούλι, ντομάτα, μαγιονέζα'],
                 'price' => 9.50, 'sort_order' => 1, 'prep_time_minutes' => 12,
                 'allergens' => ['gluten', 'eggs'],
                 'addon_groups' => [
                     [
-                        'name' => ['it' => 'Extra', 'en' => 'Extras'],
+                        'name' => ['it' => 'Extra', 'en' => 'Extras', 'de' => 'Extras', 'el' => 'Έξτρα'],
                         'addons' => [
-                            ['name' => ['it' => 'Patatine fritte', 'en' => 'French fries'], 'price' => 2.50],
-                            ['name' => ['it' => 'Bacon croccante', 'en' => 'Crispy bacon'], 'price' => 2.00],
-                            ['name' => ['it' => 'Salsa cocktail', 'en' => 'Cocktail sauce'], 'price' => 0.50],
+                            ['name' => ['it' => 'Patatine fritte', 'en' => 'French fries', 'de' => 'Pommes frites', 'el' => 'Τηγανητές πατάτες'], 'price' => 2.50],
+                            ['name' => ['it' => 'Bacon croccante', 'en' => 'Crispy bacon', 'de' => 'Knuspriger Bacon', 'el' => 'Τραγανό μπέικον'], 'price' => 2.00],
+                            ['name' => ['it' => 'Salsa cocktail', 'en' => 'Cocktail sauce', 'de' => 'Cocktailsauce', 'el' => 'Σος κοκτέιλ'], 'price' => 0.50],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'piadina-crudo-squacquerone', 'category' => 'panini-piadine', 'station' => 'kitchen',
-                'name' => ['it' => 'Piadina crudo e squacquerone', 'en' => 'Parma ham & squacquerone piadina'],
-                'description' => ['it' => 'Prosciutto crudo 18 mesi, squacquerone, rucola', 'en' => 'Parma ham, soft cheese, rocket'],
+                'name' => ['it' => 'Piadina crudo e squacquerone', 'en' => 'Parma ham & squacquerone piadina', 'de' => 'Piadina mit Parmaschinken', 'el' => 'Πιαντίνα με προσούτο'],
+                'description' => ['it' => 'Prosciutto crudo 18 mesi, squacquerone, rucola', 'en' => 'Parma ham, soft cheese, rocket', 'de' => '18 Monate Parmaschinken, Squacquerone, Rucola', 'el' => 'Προσούτο 18 μηνών, σκουακουερόνε, ρόκα'],
                 'price' => 7.00, 'sort_order' => 2, 'prep_time_minutes' => 8,
                 'allergens' => ['gluten', 'dairy'],
             ],
             [
                 'slug' => 'panino-caprese', 'category' => 'panini-piadine', 'station' => 'kitchen',
-                'name' => ['it' => 'Panino caprese', 'en' => 'Caprese sandwich'],
-                'description' => ['it' => 'Mozzarella di bufala, pomodoro, basilico', 'en' => 'Buffalo mozzarella, tomato, basil'],
+                'name' => ['it' => 'Panino caprese', 'en' => 'Caprese sandwich', 'de' => 'Caprese-Sandwich', 'el' => 'Πανίνι καπρέζε'],
+                'description' => ['it' => 'Mozzarella di bufala, pomodoro, basilico', 'en' => 'Buffalo mozzarella, tomato, basil', 'de' => 'Büffelmozzarella, Tomate, Basilikum', 'el' => 'Μοτσαρέλα βουβαλίσια, ντομάτα, βασιλικός'],
                 'price' => 6.50, 'sort_order' => 3, 'prep_time_minutes' => 6,
                 'allergens' => ['gluten', 'dairy'], 'tags' => ['vegetariano'],
                 'variant_groups' => [
                     [
-                        'name' => ['it' => 'Pane', 'en' => 'Bread'],
+                        'name' => ['it' => 'Pane', 'en' => 'Bread', 'de' => 'Brot', 'el' => 'Ψωμί'],
                         'is_required' => true,
                         'options' => [
-                            ['name' => ['it' => 'Classico', 'en' => 'Classic'], 'price' => 0.00],
-                            ['name' => ['it' => 'Integrale', 'en' => 'Wholegrain'], 'price' => 0.50],
-                            ['name' => ['it' => 'Senza glutine', 'en' => 'Gluten free'], 'price' => 1.00],
+                            ['name' => ['it' => 'Classico', 'en' => 'Classic', 'de' => 'Klassisch', 'el' => 'Κλασικό'], 'price' => 0.00],
+                            ['name' => ['it' => 'Integrale', 'en' => 'Wholegrain', 'de' => 'Vollkorn', 'el' => 'Ολικής'], 'price' => 0.50],
+                            ['name' => ['it' => 'Senza glutine', 'en' => 'Gluten free', 'de' => 'Glutenfrei', 'el' => 'Χωρίς γλουτένη'], 'price' => 1.00],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'toast-farcito', 'category' => 'panini-piadine', 'station' => 'kitchen',
-                'name' => ['it' => 'Toast farcito', 'en' => 'Toasted sandwich'],
-                'description' => ['it' => 'Prosciutto cotto e fontina, tostato', 'en' => 'Ham & cheese, toasted'],
+                'name' => ['it' => 'Toast farcito', 'en' => 'Toasted sandwich', 'de' => 'Überbackener Toast', 'el' => 'Τοστ'],
+                'description' => ['it' => 'Prosciutto cotto e fontina, tostato', 'en' => 'Ham & cheese, toasted', 'de' => 'Kochschinken und Käse, getoastet', 'el' => 'Ζαμπόν και τυρί, ψημένο'],
                 'price' => 4.50, 'sort_order' => 4, 'prep_time_minutes' => 5,
                 'allergens' => ['gluten', 'dairy'],
             ],
             // Insalate e poké
             [
                 'slug' => 'insalata-greca', 'category' => 'insalate-poke', 'station' => 'kitchen',
-                'name' => ['it' => 'Insalata greca', 'en' => 'Greek salad'],
-                'description' => ['it' => 'Feta, olive taggiasche, cetrioli, cipolla rossa', 'en' => 'Feta, olives, cucumber, red onion'],
+                'name' => ['it' => 'Insalata greca', 'en' => 'Greek salad', 'de' => 'Griechischer Salat', 'el' => 'Χωριάτικη σαλάτα'],
+                'description' => ['it' => 'Feta, olive taggiasche, cetrioli, cipolla rossa', 'en' => 'Feta, olives, cucumber, red onion', 'de' => 'Feta, Taggiasca-Oliven, Gurke, rote Zwiebel', 'el' => 'Φέτα, ελιές Τάτζιασκες, αγγούρι, κόκκινο κρεμμύδι'],
                 'price' => 8.00, 'sort_order' => 1, 'prep_time_minutes' => 8,
                 'allergens' => ['dairy'], 'tags' => ['vegetariano', 'senza-glutine'],
                 'addon_groups' => [
                     [
-                        'name' => ['it' => 'Aggiunte', 'en' => 'Add-ons'],
+                        'name' => ['it' => 'Aggiunte', 'en' => 'Add-ons', 'de' => 'Zusätze', 'el' => 'Προσθήκες'],
                         'addons' => [
-                            ['name' => ['it' => 'Feta extra', 'en' => 'Extra feta'], 'price' => 1.50],
-                            ['name' => ['it' => 'Avocado', 'en' => 'Avocado'], 'price' => 2.00],
-                            ['name' => ['it' => 'Olive taggiasche', 'en' => 'Taggiasche olives'], 'price' => 1.00],
+                            ['name' => ['it' => 'Feta extra', 'en' => 'Extra feta', 'de' => 'Extra Feta', 'el' => 'Έξτρα φέτα'], 'price' => 1.50],
+                            ['name' => ['it' => 'Avocado', 'en' => 'Avocado', 'de' => 'Avocado', 'el' => 'Αβοκάντο'], 'price' => 2.00],
+                            ['name' => ['it' => 'Olive taggiasche', 'en' => 'Taggiasche olives', 'de' => 'Taggiasca-Oliven', 'el' => 'Ελιές Τάτζιασκες'], 'price' => 1.00],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'poke-salmone', 'category' => 'insalate-poke', 'station' => 'kitchen',
-                'name' => ['it' => 'Poké al salmone', 'en' => 'Salmon poké'],
-                'description' => ['it' => 'Salmone marinato, edamame, mango, salsa ponzu', 'en' => 'Marinated salmon, edamame, mango, ponzu'],
+                'name' => ['it' => 'Poké al salmone', 'en' => 'Salmon poké', 'de' => 'Lachs-Poké', 'el' => 'Πόκε με σολωμό'],
+                'description' => ['it' => 'Salmone marinato, edamame, mango, salsa ponzu', 'en' => 'Marinated salmon, edamame, mango, ponzu', 'de' => 'Marinierter Lachs, Edamame, Mango, Ponzu', 'el' => 'Μαριναρισμένος σολωμός, ενταμάμε, μάνγκο, πόνζου'],
                 'price' => 12.00, 'sort_order' => 2, 'prep_time_minutes' => 10,
                 'allergens' => ['fish', 'soy'], 'tags' => ['senza-glutine'],
                 'variant_groups' => [
                     [
-                        'name' => ['it' => 'Base', 'en' => 'Base'],
+                        'name' => ['it' => 'Base', 'en' => 'Base', 'de' => 'Basis', 'el' => 'Βάση'],
                         'is_required' => true,
                         'options' => [
-                            ['name' => ['it' => 'Riso bianco', 'en' => 'White rice'], 'price' => 0.00],
-                            ['name' => ['it' => 'Riso venere', 'en' => 'Black rice'], 'price' => 1.00],
-                            ['name' => ['it' => 'Insalata verde', 'en' => 'Green salad'], 'price' => 0.00],
+                            ['name' => ['it' => 'Riso bianco', 'en' => 'White rice', 'de' => 'Weißer Reis', 'el' => 'Λευκό ρύζι'], 'price' => 0.00],
+                            ['name' => ['it' => 'Riso venere', 'en' => 'Black rice', 'de' => 'Schwarzer Reis', 'el' => 'Μαύρο ρύζι'], 'price' => 1.00],
+                            ['name' => ['it' => 'Insalata verde', 'en' => 'Green salad', 'de' => 'Grüner Salat', 'el' => 'Πράσινη σαλάτα'], 'price' => 0.00],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'caesar-pollo', 'category' => 'insalate-poke', 'station' => 'kitchen',
-                'name' => ['it' => 'Caesar con pollo', 'en' => 'Chicken caesar'],
-                'description' => ['it' => 'Pollo grigliato, crostini, scaglie di grana', 'en' => 'Grilled chicken, croutons, parmesan'],
+                'name' => ['it' => 'Caesar con pollo', 'en' => 'Chicken caesar', 'de' => 'Caesar Salad mit Hähnchen', 'el' => 'Σίζαρ με κοτόπουλο'],
+                'description' => ['it' => 'Pollo grigliato, crostini, scaglie di grana', 'en' => 'Grilled chicken, croutons, parmesan', 'de' => 'Gegrilltes Hähnchen, Croûtons, Parmesan', 'el' => 'Ψητό κοτόπουλο, κρουτόν, παρμεζάνα'],
                 'price' => 9.00, 'sort_order' => 3, 'prep_time_minutes' => 10,
                 'allergens' => ['gluten', 'eggs', 'dairy'],
             ],
             // Bibite e cocktail
             [
                 'slug' => 'acqua-naturale', 'category' => 'bibite-cocktail', 'station' => 'bar',
-                'name' => ['it' => 'Acqua naturale', 'en' => 'Still water'],
-                'description' => ['it' => 'Bottiglia 50cl, servita fresca', 'en' => '50cl bottle, served chilled'],
+                'name' => ['it' => 'Acqua naturale', 'en' => 'Still water', 'de' => 'Stilles Wasser', 'el' => 'Φυσικό νερό'],
+                'description' => ['it' => 'Bottiglia 50cl, servita fresca', 'en' => '50cl bottle, served chilled', 'de' => '50-cl-Flasche, gekühlt serviert', 'el' => 'Μπουκάλι 50cl, σερβιρισμένο δροσερό'],
                 'price' => 2.00, 'sort_order' => 1, 'tags' => ['vegano', 'senza-glutine'],
             ],
             [
                 'slug' => 'coca-cola', 'category' => 'bibite-cocktail', 'station' => 'bar',
-                'name' => ['it' => 'Coca-Cola', 'en' => 'Coca-Cola'],
-                'description' => ['it' => 'Bottiglia in vetro 33cl con ghiaccio e limone', 'en' => '33cl glass bottle with ice & lemon'],
+                'name' => ['it' => 'Coca-Cola', 'en' => 'Coca-Cola', 'de' => 'Coca-Cola', 'el' => 'Coca-Cola'],
+                'description' => ['it' => 'Bottiglia in vetro 33cl con ghiaccio e limone', 'en' => '33cl glass bottle with ice & lemon', 'de' => '33-cl-Glasflasche mit Eis und Zitrone', 'el' => 'Γυάλινο μπουκάλι 33cl με πάγο και λεμόνι'],
                 'price' => 3.50, 'sort_order' => 2,
                 'track_inventory' => true, 'stock_quantity' => 48, 'low_stock_threshold' => 8,
             ],
             [
                 'slug' => 'spritz-aperol', 'category' => 'bibite-cocktail', 'station' => 'bar',
-                'name' => ['it' => 'Spritz Aperol', 'en' => 'Aperol spritz'],
-                'description' => ['it' => 'Aperol, prosecco, soda, fetta d’arancia', 'en' => 'Aperol, prosecco, soda, orange'],
+                'name' => ['it' => 'Spritz Aperol', 'en' => 'Aperol spritz', 'de' => 'Aperol Spritz', 'el' => 'Σπριτς Απερόλ'],
+                'description' => ['it' => 'Aperol, prosecco, soda, fetta d’arancia', 'en' => 'Aperol, prosecco, soda, orange', 'de' => 'Aperol, Prosecco, Soda, Orangenscheibe', 'el' => 'Απερόλ, prosecco, σόδα, φέτα πορτοκάλι'],
                 'price' => 7.00, 'sort_order' => 3, 'prep_time_minutes' => 4,
                 'allergens' => ['sulfites'], 'tags' => ['vegano', 'senza-glutine'],
                 'variant_groups' => [
                     [
-                        'name' => ['it' => 'Formato', 'en' => 'Size'],
+                        'name' => ['it' => 'Formato', 'en' => 'Size', 'de' => 'Größe', 'el' => 'Μέγεθος'],
                         'is_required' => true,
                         'options' => [
-                            ['name' => ['it' => 'Classico', 'en' => 'Classic'], 'price' => 0.00],
-                            ['name' => ['it' => 'Grande', 'en' => 'Large'], 'price' => 2.00],
+                            ['name' => ['it' => 'Classico', 'en' => 'Classic', 'de' => 'Klassisch', 'el' => 'Κλασικό'], 'price' => 0.00],
+                            ['name' => ['it' => 'Grande', 'en' => 'Large', 'de' => 'Groß', 'el' => 'Μεγάλο'], 'price' => 2.00],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'mojito-analcolico', 'category' => 'bibite-cocktail', 'station' => 'bar',
-                'name' => ['it' => 'Mojito analcolico', 'en' => 'Virgin mojito'],
-                'description' => ['it' => 'Menta fresca, lime, soda, zucchero di canna', 'en' => 'Fresh mint, lime, soda'],
+                'name' => ['it' => 'Mojito analcolico', 'en' => 'Virgin mojito', 'de' => 'Virgin Mojito', 'el' => 'Μοχίτο χωρίς αλκοόλ'],
+                'description' => ['it' => 'Menta fresca, lime, soda, zucchero di canna', 'en' => 'Fresh mint, lime, soda', 'de' => 'Frische Minze, Limette, Soda', 'el' => 'Φρέσκος δυόσμος, λάιμ, σόδα'],
                 'price' => 6.00, 'sort_order' => 4, 'prep_time_minutes' => 5,
                 'tags' => ['vegano', 'senza-glutine'],
                 'addon_groups' => [
                     [
-                        'name' => ['it' => 'Extra', 'en' => 'Extras'],
+                        'name' => ['it' => 'Extra', 'en' => 'Extras', 'de' => 'Extras', 'el' => 'Έξτρα'],
                         'addons' => [
-                            ['name' => ['it' => 'Menta extra', 'en' => 'Extra mint'], 'price' => 0.50],
-                            ['name' => ['it' => 'Zenzero fresco', 'en' => 'Fresh ginger'], 'price' => 0.50],
+                            ['name' => ['it' => 'Menta extra', 'en' => 'Extra mint', 'de' => 'Extra Minze', 'el' => 'Έξτρα δυόσμος'], 'price' => 0.50],
+                            ['name' => ['it' => 'Zenzero fresco', 'en' => 'Fresh ginger', 'de' => 'Frischer Ingwer', 'el' => 'Φρέσκο τζίντζερ'], 'price' => 0.50],
                         ],
                     ],
                 ],
             ],
             [
                 'slug' => 'birra-artigianale', 'category' => 'bibite-cocktail', 'station' => 'bar',
-                'name' => ['it' => 'Birra artigianale', 'en' => 'Craft beer'],
-                'description' => ['it' => 'Blanche 33cl del birrificio locale', 'en' => '33cl blanche from the local brewery'],
+                'name' => ['it' => 'Birra artigianale', 'en' => 'Craft beer', 'de' => 'Craft-Bier', 'el' => 'Χειροποίητη μπύρα'],
+                'description' => ['it' => 'Blanche 33cl del birrificio locale', 'en' => '33cl blanche from the local brewery', 'de' => 'Blanche 33 cl von der lokalen Brauerei', 'el' => 'Blanche 33cl από τοπική ζυθοποιία'],
                 'price' => 5.50, 'sort_order' => 5,
                 'allergens' => ['gluten'],
                 'track_inventory' => true, 'stock_quantity' => 36, 'low_stock_threshold' => 6,

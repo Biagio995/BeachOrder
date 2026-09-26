@@ -8,13 +8,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | When DEMO_MODE=true the app runs a safe public demo:
-    | - Stripe is test-only: live keys (anything not starting with
-    |   sk_test_/pk_test_) are rejected at boot by `demo:check` and every
-    |   Stripe service reports "not configured" so no real charge can happen.
+    | - Online payments stay off product-wide: customers order and pay at the
+    |   venue (pay_at_location). No payment keys are needed for the demo.
     | - Kitchen printers and POS integrations are disabled unless explicitly
     |   re-enabled via DEMO_PRINTERS_ENABLED / DEMO_POS_ENABLED (default off,
     |   so the app never attempts a TCP/printer/POS connection).
-    | - Per-tenant card payments (Nexi XPay) are forced to the test gateway.
+    | - Per-tenant card payments, if ever configured, are forced to sandbox
+    |   gateways (see NexiXPayService).
     |
     */
 

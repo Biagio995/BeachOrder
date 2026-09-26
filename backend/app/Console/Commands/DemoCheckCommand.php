@@ -10,7 +10,7 @@ class DemoCheckCommand extends Command
     protected $signature = 'demo:check
         {--fail : Exit with code 1 when demo-mode violations are found}';
 
-    protected $description = 'Verify demo-mode safety (Stripe test-only, printers/POS off)';
+    protected $description = 'Verify demo-mode safety (online payments off, printers/POS off)';
 
     public function handle(): int
     {
@@ -22,28 +22,20 @@ class DemoCheckCommand extends Command
 
         $violations = DemoMode::violations();
 
-        $this->info('DEMO_MODE=true');
-        $this->line('Stripe keys: '.(DemoMode::stripeKeysAreTestOnly() ? 'OK (test-only or empty)' : 'LIVE KEYS DETECTED'));
+        $this->info('DEMO_MODE=true (online payments off, pay at location only)');
         $this->line('Printers: '.(DemoMode::printersEnabled() ? 'EXPLICITLY ENABLED' : 'disabled'));
         $this->line('POS: '.(DemoMode::posEnabled() ? 'EXPLICITLY ENABLED' : 'disabled'));
 
+        foreach ($violations as $violation) {
+            $this->warn($violation);
+        }
+
+        if ($this->option('fail') && $violations !== []) {
+            return self::FAILURE;
+        }
+
         if ($violations === []) {
             $this->info('Demo safety check passed.');
-
-            return self::SUCCESS;
-        }
-
-        foreach ($violations as $violation) {
-            // Live keys are a hard failure; explicit hardware opt-ins are warnings.
-            if (str_contains($violation, 'Live Stripe keys')) {
-                $this->error($violation);
-            } else {
-                $this->warn($violation);
-            }
-        }
-
-        if ($this->option('fail') && ! DemoMode::stripeKeysAreTestOnly()) {
-            return self::FAILURE;
         }
 
         return self::SUCCESS;

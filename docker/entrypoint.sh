@@ -65,7 +65,7 @@ if [ "${DEMO_SEED:-false}" = "true" ]; then
 fi
 
 if [ "${DEMO_MODE:-false}" = "true" ]; then
-  echo "==> Demo safety check (refuses boot on live Stripe keys)"
+  echo "==> Demo safety check (refuses boot on unsafe demo config)"
   php artisan demo:check --fail
 fi
 
