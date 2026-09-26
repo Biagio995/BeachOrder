@@ -1,11 +1,11 @@
 {
   "app": {
-    "name": "Servio",
+    "name": "{appName}",
     "tagline": "Ordina dal tuo tavolo"
   },
   "landing": {
     "headline": "Ordina dal tavolo, senza code.",
-    "lead": "Servio mette menu, ordini e servizio sul QR del tuo locale: più veloce per i clienti, più chiaro per cucina e sala.",
+    "lead": "{appName} mette menu, ordini e servizio sul QR del tuo locale: più veloce per i clienti, più chiaro per cucina e sala.",
     "ctaDemo": "Prova la demo",
     "ctaStaff": "Accesso staff",
     "ctaRegister": "Registra il tuo locale",

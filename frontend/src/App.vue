@@ -13,6 +13,7 @@ import { useActiveOrderStore } from '@/stores/activeOrder'
 import { useUiStore } from '@/stores/ui'
 import { resetEcho } from '@/plugins/echo'
 import { applyBrandingTheme, applyPageBranding, resetBrandingTheme, resetPageBranding } from '@/utils/branding'
+import { APP_NAME } from '@/config/brand'
 import { resolvePublicAssetUrl } from '@/utils/publicAssetUrl'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import CookieConsentBanner from '@/components/shared/CookieConsentBanner.vue'
@@ -48,7 +49,7 @@ const isLegalPage = computed(
     route.name === 'dpa' ||
     route.name === 'data-processing-roles',
 )
-/** Servio marketing/platform surfaces — never inherit a tenant white-label. */
+/** Marketing/platform surfaces — never inherit a tenant white-label. */
 const isPlatformSurface = computed(
   () => isLanding.value || isAuthPage.value || isLegalPage.value || route.name === 'admin-tenants',
 )
@@ -77,8 +78,8 @@ const tenantBase = computed(() => {
 })
 
 const brandTitle = computed(() => {
-  if (isLanding.value || isAuthPage.value) return t('app.name')
-  if (isStaffArea.value) return auth.user?.tenant?.name || t('app.name')
+  if (isLanding.value || isAuthPage.value) return t('app.name', { appName: APP_NAME })
+  if (isStaffArea.value) return auth.user?.tenant?.name || t('app.name', { appName: APP_NAME })
   return menu.tenant?.name || ''
 })
 
@@ -391,7 +392,7 @@ function goStaff(path: string) {
     >
       <div class="pa-4">
         <div class="display-font text-h6 mb-1" style="color: var(--bo-teal-deep)">
-          {{ auth.user?.tenant?.name || t('app.name') }}
+          {{ auth.user?.tenant?.name || t('app.name', { appName: APP_NAME }) }}
         </div>
         <div v-if="auth.user?.name" class="text-medium-emphasis text-body-2 mb-4">
           {{ auth.user.name }}
