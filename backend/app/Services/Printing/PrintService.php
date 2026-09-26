@@ -7,6 +7,7 @@ use App\Models\OrderPrintLog;
 use App\Models\Tenant;
 use App\Services\AuditLogger;
 use App\Services\PaymentService;
+use App\Support\OrderNumber;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use RuntimeException;
@@ -231,7 +232,7 @@ class PrintService
     private function buildTestTicketText(Tenant $tenant, string $station, string $locale): string
     {
         $order = new Order([
-            'order_number' => 'BO-TEST-00001',
+            'order_number' => OrderNumber::prefix().'-TEST-00001',
             'notes' => $locale === 'it' ? 'Stampa di prova' : 'Test print',
             'created_at' => now(),
         ]);
