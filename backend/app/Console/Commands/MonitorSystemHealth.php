@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Services\Monitoring\CriticalErrorAlerter;
 use App\Services\Monitoring\HealthCheckService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 
 class MonitorSystemHealth extends Command
 {
@@ -15,11 +14,9 @@ class MonitorSystemHealth extends Command
 
     public function handle(HealthCheckService $health): int
     {
-        Cache::put(
-            (string) config('monitoring.queue_heartbeat_key'),
-            now()->toIso8601String(),
-            now()->addMinutes(5)
-        );
+        // Queue heartbeat is owned by the worker process (WorkerStarting /
+        // Looping). Do not fake it here — that made worker_alive:true even
+        // when no queue:work was running (and demo has no scheduler anyway).
 
         $report = $health->run();
 
