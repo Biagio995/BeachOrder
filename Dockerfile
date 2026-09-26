@@ -72,8 +72,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pdo_pgsql \
         pdo_sqlite \
         pgsql \
-        sqlite3 \
         zip \
+    && cd /tmp \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && rm -rf /var/lib/apt/lists/*
