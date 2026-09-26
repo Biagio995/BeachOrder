@@ -85,6 +85,7 @@ COPY --from=frontend /app/dist /var/www/frontend
 COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/zz-local.ini
+COPY docker/php/fpm-www.conf /usr/local/etc/php-fpm.d/zz-demo.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
@@ -100,14 +101,15 @@ RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chown -R www-data:www-data /data storage bootstrap/cache /var/www/frontend \
     && chmod -R ug+rwx /data storage bootstrap/cache
 
-# Single-container demo defaults: one public $PORT, SQLite on a volume path,
-# Postgres stays available via DB_* env overrides (see docs/DEMO.md).
+# Single-container demo defaults: one public $PORT (hosts inject their own;
+# default 80), SQLite on a volume path, Postgres stays available via DB_* env.
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
     PHP_FPM_LISTEN=9000 \
-    PORT=8080 \
+    PORT=80 \
     REVERB_SERVER_PORT=6001 \
+    SCHEDULER_ENABLED=true \
     DB_CONNECTION=sqlite \
     DB_DATABASE=/data/demo.sqlite \
     DEMO_MODE=false \
@@ -115,10 +117,10 @@ ENV APP_ENV=production \
     RUN_MIGRATIONS=true \
     RUN_SEEDERS=false
 
-EXPOSE 8080
+EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:${PORT:-8080}/up || exit 1
+    CMD curl -fsS http://127.0.0.1:${PORT:-80}/up || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

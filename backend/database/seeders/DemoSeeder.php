@@ -65,6 +65,7 @@ class DemoSeeder extends Seeder
         TenantContext::set($tenant);
 
         try {
+            $this->seedSuperAdmin();
             $this->seedUsers($tenant);
             $this->seedLocations($tenant);
             $tags = $this->seedTags($tenant);
@@ -74,6 +75,25 @@ class DemoSeeder extends Seeder
         }
 
         $this->command?->info("Demo venue ready: {$tenant->name} ({$tenant->slug})");
+    }
+
+    /**
+     * Platform super admin from env (same contract as DatabaseSeeder, so the
+     * two seeders never fight over this account).
+     */
+    private function seedSuperAdmin(): void
+    {
+        User::query()->updateOrCreate(
+            ['email' => (string) env('SUPER_ADMIN_EMAIL', 'super@servio.test')],
+            [
+                'tenant_id' => null,
+                'name' => (string) env('SUPER_ADMIN_NAME', 'Platform Super Admin'),
+                'password' => Hash::make(DemoMode::password('SUPER_ADMIN_PASSWORD', 'super admin')),
+                'role' => User::ROLE_SUPER_ADMIN,
+                'staff_position' => null,
+                'is_active' => true,
+            ]
+        )->markEmailAsVerified();
     }
 
     private function seedUsers(Tenant $tenant): void
