@@ -49,7 +49,7 @@ const isLegalPage = computed(
     route.name === 'dpa' ||
     route.name === 'data-processing-roles',
 )
-/** Servio marketing/platform surfaces — never inherit a tenant white-label. */
+/** Marketing/platform surfaces — never inherit a tenant white-label. */
 const isPlatformSurface = computed(
   () => isLanding.value || isAuthPage.value || isLegalPage.value || route.name === 'admin-tenants',
 )
