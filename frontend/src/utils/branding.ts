@@ -1,10 +1,9 @@
 type ThemeLike = {
   themes: {
     value: {
-      beach?: {
-        colors?: Record<string, string>
+      beach: {
+        colors: Record<string, string>
       }
-      [name: string]: { colors?: Record<string, string> } | undefined
     }
   }
 }
@@ -13,7 +12,7 @@ export type BrandingColors = {
   primary_color?: string
   accent_color?: string
   secondary_color?: string
-  [key: string]: string | null | undefined
+  [key: string]: string | undefined
 }
 
 /** Servio platform defaults (landing, auth, platform admin). */
@@ -120,17 +119,15 @@ function paintTheme(
   },
 ) {
   const { primary, primaryDeep, accent, foam } = opts
-  const beach = theme.themes.value.beach ?? (theme.themes.value.beach = { colors: {} })
-  const colors = beach.colors ?? (beach.colors = {})
 
-  colors.primary = primary
-  colors.secondary = primary
-  colors.accent = accent
-  colors['on-primary'] = onColor(primary)
-  colors['on-secondary'] = onColor(primary)
-  colors['on-accent'] = onColor(accent)
-  colors.background = foam
-  colors.surface = WHITE
+  theme.themes.value.beach.colors.primary = primary
+  theme.themes.value.beach.colors.secondary = primary
+  theme.themes.value.beach.colors.accent = accent
+  theme.themes.value.beach.colors['on-primary'] = onColor(primary)
+  theme.themes.value.beach.colors['on-secondary'] = onColor(primary)
+  theme.themes.value.beach.colors['on-accent'] = onColor(accent)
+  theme.themes.value.beach.colors.background = foam
+  theme.themes.value.beach.colors.surface = WHITE
 
   document.documentElement.style.setProperty('--bo-teal', primary)
   document.documentElement.style.setProperty('--bo-teal-deep', primaryDeep)
