@@ -119,6 +119,33 @@ class MonitoringTest extends TestCase
         $this->artisan('monitor:health')->assertSuccessful();
     }
 
+    public function test_queue_worker_events_write_heartbeat_for_health_check(): void
+    {
+        Cache::flush();
+
+        $before = $this->getJson('/api/health');
+        $before->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', false);
+
+        event(new \Illuminate\Queue\Events\WorkerStarting('database', 'default', new \Illuminate\Queue\WorkerOptions));
+
+        $after = $this->getJson('/api/health');
+        $after->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', true);
+    }
+
+    public function test_monitor_health_does_not_fake_queue_heartbeat(): void
+    {
+        Cache::flush();
+
+        $this->artisan('monitor:health')->assertSuccessful();
+
+        $this->assertNull(Cache::get((string) config('monitoring.queue_heartbeat_key')));
+        $this->getJson('/api/health')
+            ->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', false);
+    }
+
     public function test_log_redactor_masks_sensitive_and_pii_fields(): void
     {
         $redacted = LogRedactor::redact([
