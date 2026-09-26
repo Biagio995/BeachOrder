@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Services\Monitoring\QueueHeartbeat;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -25,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Real worker liveness for /api/health (no scheduler required).
+        Event::listen([WorkerStarting::class, Looping::class], function () {
+            QueueHeartbeat::touch();
+        });
+
         Password::defaults(function () {
             $rule = Password::min(8);
 

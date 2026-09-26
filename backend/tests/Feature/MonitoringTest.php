@@ -7,11 +7,13 @@ use App\Models\BackupLog;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\Monitoring\BackupMonitor;
+use App\Services\Monitoring\QueueHeartbeat;
 use App\Services\Monitoring\RequestMetrics;
 use App\Services\Monitoring\WebhookMonitor;
 use App\Support\LogRedactor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
@@ -117,6 +119,91 @@ class MonitoringTest extends TestCase
     public function test_monitor_health_command_runs_successfully(): void
     {
         $this->artisan('monitor:health')->assertSuccessful();
+    }
+
+    public function test_queue_worker_events_write_heartbeat_for_health_check(): void
+    {
+        Cache::flush();
+
+        $before = $this->getJson('/api/health');
+        $before->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', false);
+
+        event(new \Illuminate\Queue\Events\WorkerStarting('database', 'default', new \Illuminate\Queue\WorkerOptions));
+
+        $after = $this->getJson('/api/health');
+        $after->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', true);
+    }
+
+    public function test_monitor_health_does_not_fake_queue_heartbeat(): void
+    {
+        Cache::flush();
+
+        $this->artisan('monitor:health')->assertSuccessful();
+
+        $this->assertNull(Cache::get((string) config('monitoring.queue_heartbeat_key')));
+        $this->getJson('/api/health')
+            ->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', false);
+    }
+
+    public function test_worker_alive_false_when_heartbeat_older_than_max_age(): void
+    {
+        Cache::flush();
+        config(['monitoring.queue_heartbeat_max_age_seconds' => 8]);
+
+        QueueHeartbeat::touch();
+
+        $this->getJson('/api/health')
+            ->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', true);
+
+        $this->travel(9)->seconds();
+
+        $this->getJson('/api/health')
+            ->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', false);
+    }
+
+    public function test_worker_alive_true_within_max_age(): void
+    {
+        Cache::flush();
+        config(['monitoring.queue_heartbeat_max_age_seconds' => 30]);
+
+        QueueHeartbeat::touch();
+        $this->travel(10)->seconds();
+
+        $this->getJson('/api/health')
+            ->assertOk()
+            ->assertJsonPath('checks.background_jobs.worker_alive', true);
+    }
+
+    public function test_queue_heartbeat_touch_swallows_cache_failures(): void
+    {
+        $logged = [];
+        Log::listen(function (object $event) use (&$logged): void {
+            $logged[] = [
+                'level' => $event->level,
+                'message' => $event->message,
+                'context' => $event->context ?? [],
+            ];
+        });
+
+        Cache::shouldReceive('put')
+            ->once()
+            ->andThrow(new \RuntimeException('cache unavailable'));
+
+        QueueHeartbeat::touch();
+
+        $this->assertTrue(
+            collect($logged)->contains(function (array $entry): bool {
+                return ($entry['level'] ?? null) === 'warning'
+                    && str_contains((string) ($entry['message'] ?? ''), 'Failed to write queue worker heartbeat')
+                    && ($entry['context']['message'] ?? null) === 'cache unavailable';
+            }),
+            'Expected a warning log when the cache write fails'
+        );
     }
 
     public function test_log_redactor_masks_sensitive_and_pii_fields(): void

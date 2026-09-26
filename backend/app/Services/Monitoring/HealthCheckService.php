@@ -128,8 +128,10 @@ class HealthCheckService
 
         $heartbeat = Cache::get((string) config('monitoring.queue_heartbeat_key'));
         $maxAge = (int) config('monitoring.queue_heartbeat_max_age_seconds', 120);
+        // Carbon 3 returns a signed diff (negative when $heartbeat is in the past).
+        // Use the absolute age so staleness is independent of cache TTL.
         $workerAlive = is_string($heartbeat)
-            && now()->diffInSeconds($heartbeat) <= $maxAge;
+            && abs((float) now()->diffInSeconds($heartbeat)) <= $maxAge;
 
         $threshold = (int) config('monitoring.failed_jobs_alert_threshold', 5);
         $status = 'ok';

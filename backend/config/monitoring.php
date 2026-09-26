@@ -16,7 +16,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Queue worker liveness (updated by queue:work / monitor command)
+    | Queue worker liveness (updated by queue:work WorkerStarting / Looping)
     |--------------------------------------------------------------------------
     */
 
