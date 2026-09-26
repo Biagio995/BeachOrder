@@ -17,6 +17,7 @@ use App\Services\Printing\PrintService;
 use App\Services\ProductCustomizationService;
 use App\Services\StripeOrderPaymentService;
 use App\Support\LocalizedText;
+use App\Support\OrderNumber;
 use App\Support\RolePermissions;
 use App\Support\TenantContext;
 use App\Support\TenantRules;
@@ -136,7 +137,7 @@ class OrderController extends Controller
             }
 
             $order = Order::create([
-                'order_number' => 'BO-' . now()->format('ymd') . '-' . Str::upper(Str::random(5)),
+                'order_number' => OrderNumber::generate(),
                 'location_id' => $location->id,
                 'status' => 'received',
                 'kitchen_status' => $hasKitchen ? 'received' : null,

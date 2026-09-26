@@ -153,6 +153,10 @@ class OrderFlowTest extends TestCase
 
         $create->assertCreated();
         $orderId = $create->json('id');
+        $this->assertMatchesRegularExpression(
+            '/^ORD-\d{6}-[A-Z0-9]{5}$/',
+            (string) $create->json('order_number')
+        );
 
         $this->assertSame(8, $this->product->fresh()->stock_quantity);
 
@@ -453,5 +457,74 @@ class OrderFlowTest extends TestCase
                 ['product_id' => $this->product->id, 'quantity' => 1],
             ],
         ])->assertStatus(422);
+    }
+
+    public function test_order_number_uses_configured_prefix(): void
+    {
+        config(['orders.number_prefix' => 'DP']);
+
+        $access = $this->claimAccess();
+
+        $create = $this->postJson('/api/t/test-beach/orders', [
+            'location_code' => 'umbrella99',
+            'access_token' => $access['access_token'],
+            'customer_session' => $access['customer_session'],
+            'payment_method' => 'pay_at_location',
+            'items' => [
+                ['product_id' => $this->product->id, 'quantity' => 1],
+            ],
+        ])->assertCreated();
+
+        $this->assertMatchesRegularExpression(
+            '/^DP-\d{6}-[A-Z0-9]{5}$/',
+            (string) $create->json('order_number')
+        );
+    }
+
+    public function test_invalid_order_number_prefix_falls_back_to_ord(): void
+    {
+        config(['orders.number_prefix' => '']);
+
+        $access = $this->claimAccess();
+
+        $create = $this->postJson('/api/t/test-beach/orders', [
+            'location_code' => 'umbrella99',
+            'access_token' => $access['access_token'],
+            'customer_session' => $access['customer_session'],
+            'payment_method' => 'pay_at_location',
+            'items' => [
+                ['product_id' => $this->product->id, 'quantity' => 1],
+            ],
+        ])->assertCreated();
+
+        $this->assertMatchesRegularExpression(
+            '/^ORD-\d{6}-[A-Z0-9]{5}$/',
+            (string) $create->json('order_number')
+        );
+    }
+
+    public function test_legacy_bo_order_number_remains_retrievable(): void
+    {
+        TenantContext::set($this->tenant);
+
+        $legacy = Order::query()->create([
+            'order_number' => 'BO-260101-LEGACY',
+            'location_id' => $this->location->id,
+            'status' => 'received',
+            'bar_status' => 'received',
+            'customer_session' => 'legacy-session',
+            'subtotal' => 8.5,
+            'total' => 8.5,
+            'payment_method' => 'pay_at_location',
+            'payment_status' => 'unpaid',
+        ]);
+
+        TenantContext::clear();
+
+        $this->assertSame('BO-260101-LEGACY', $legacy->fresh()->order_number);
+
+        $this->getJson("/api/t/test-beach/orders/{$legacy->id}?session=legacy-session")
+            ->assertOk()
+            ->assertJsonPath('order_number', 'BO-260101-LEGACY');
     }
 }

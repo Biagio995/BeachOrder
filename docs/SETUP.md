@@ -85,6 +85,8 @@ Senza Docker: `MAIL_MAILER=log` e leggi `backend/storage/logs/laravel.log`.
 
 ## Flusso demo
 
+Per il servizio demo impostare `ORDER_NUMBER_PREFIX=DP` in `backend/.env` (ordine es. `DP-260926-ABCDE`).
+
 1. Cliente: apri `http://localhost:5173/t/azure-beach/q/table3`
 2. Aggiungi prodotti → carrello → invia ordine
 3. Bar: login `bar@servio.test` / `password` → `/kitchen`
