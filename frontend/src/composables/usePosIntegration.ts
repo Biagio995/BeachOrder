@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import api, { getApiErrorMessage } from '@/api/client'
+import { getActiveLocale } from '@/plugins/i18n'
 
 export type PosIntegrationProvider = 'epsilon_pylon' | 'softone' | 'custom'
 export type PosConnectionStatus = 'disconnected' | 'connected' | 'error'
@@ -122,7 +123,7 @@ export function usePosIntegration() {
     const { data } = await api.get<{ data: PosMappingEntityOption[] }>('/admin/pos-mappings/entities', {
       params: {
         entity_type: entityType,
-        locale: locale || localStorage.getItem('bo_locale') || undefined,
+        locale: locale || getActiveLocale(),
       },
     })
     return data.data ?? []

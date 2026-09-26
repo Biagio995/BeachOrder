@@ -12,6 +12,7 @@ import { useMenuStore } from '@/stores/menu'
 import { useActiveOrderStore } from '@/stores/activeOrder'
 import { useUiStore } from '@/stores/ui'
 import { resetEcho } from '@/plugins/echo'
+import { setUserLocale } from '@/plugins/i18n'
 import { applyBrandingTheme, applyPageBranding, resetBrandingTheme, resetPageBranding } from '@/utils/branding'
 import { APP_NAME } from '@/config/brand'
 import { resolvePublicAssetUrl } from '@/utils/publicAssetUrl'
@@ -208,11 +209,10 @@ watch(
 )
 
 async function setLocale(code: string | null) {
-  if (!code) return
-  locale.value = code
-  localStorage.setItem('bo_locale', code)
+  const next = setUserLocale(code)
+  if (!next) return
   if (isCustomer.value) {
-    await menu.loadMenu(code)
+    await menu.loadMenu(next)
     cart.syncLabelsFromCategories(menu.categories)
   }
 }

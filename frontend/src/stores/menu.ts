@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api, { tenantPath } from '@/api/client'
+import { applyTenantDefaultLocale } from '@/plugins/i18n'
 import type { Category, Location, TenantBranding, TenantSettings } from '@/types'
 
 export interface TenantInfo {
@@ -177,9 +178,7 @@ export const useMenuStore = defineStore('menu', () => {
       location.value = data.location
       tenant.value = data.tenant
       tenantInactive.value = false
-      if (data.tenant?.default_locale && !localStorage.getItem('bo_locale')) {
-        localStorage.setItem('bo_locale', data.tenant.default_locale)
-      }
+      applyTenantDefaultLocale(data.tenant?.default_locale)
     } catch (e: unknown) {
       if (isInactiveError(e)) return
       error.value = 'Failed to load menu'
