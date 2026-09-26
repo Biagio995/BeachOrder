@@ -1,10 +1,10 @@
-# Single-container public demo (video campaign): app + Reverb + queue (+scheduler)
+# Single-container public demo (video campaign): app + Reverb + optional queue
 # in ONE container, SQLite on a volume, single public $PORT.
 # Local run:
 #   cp .env.demo.example .env.demo   # fill APP_KEY, APP_URL/PUBLIC_URL, demo passwords
 #   docker compose -f docker-compose.demo.yml --env-file .env.demo up -d --build
 #
-# Koyeb does not use this file (see docs/DEMO.md), but it mirrors the same env.
+# Render does not use this file (see docs/DEMO.md), but it mirrors the same env.
 
 services:
   demo:
@@ -18,30 +18,28 @@ services:
         VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-pcrxnxletfeemtelvhyn}
         VITE_DEMO_TENANT: ${DEMO_TENANT_SLUG:-lido-azzurra}
         VITE_DEMO_LOCATION: ${DEMO_QR_FIRST_CODE:-umbrella01}
-    image: servio-demo:latest
-    container_name: servio-demo
+    image: demo-app:latest
+    container_name: demo-app
     restart: unless-stopped
     ports:
-      - "${DEMO_HOST_PORT:-8080}:${PORT:-80}"
+      - "${DEMO_HOST_PORT:-10000}:${PORT:-10000}"
     env_file:
       - ${ENV_FILE:-.env.demo}
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      PORT: ${PORT:-80}
+      PORT: ${PORT:-10000}
       DB_CONNECTION: sqlite
       DB_DATABASE: /data/demo.sqlite
       SESSION_DRIVER: database
       CACHE_STORE: database
-      QUEUE_CONNECTION: database
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-database}
+      DEMO_QUEUE_WORKER: ${DEMO_QUEUE_WORKER:-true}
       BROADCAST_CONNECTION: reverb
-      REVERB_SERVER_HOST: 0.0.0.0
-      REVERB_SERVER_PORT: 6001
+      REVERB_SERVER_HOST: 127.0.0.1
+      REVERB_SERVER_PORT: 8080
       REVERB_SCHEME: http
-      # Tiny host: drop the scheduler process (per-minute jobs are also gated
-      # in routes/console.php while DEMO_MODE=true).
-      SCHEDULER_ENABLED: "false"
-      # Safe demo defaults (also set these on Koyeb — see docs/DEMO.md).
+      # Safe demo defaults (also set these on Render — see docs/DEMO.md).
       DEMO_MODE: "true"
       DEMO_SEED: ${DEMO_SEED:-true}
       MAIL_MAILER: log
@@ -52,15 +50,15 @@ services:
       RUN_MIGRATIONS: "true"
       RUN_SEEDERS: "false"
     volumes:
-      - servio_demo_data:/data
-      - servio_demo_storage:/var/www/html/storage/app
+      - demo_app_data:/data
+      - demo_app_storage:/var/www/html/storage/app
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${PORT:-80}/up || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${PORT:-10000}/up || exit 1"]
       interval: 30s
       timeout: 5s
       start_period: 60s
       retries: 3
 
 volumes:
-  servio_demo_data:
-  servio_demo_storage:
+  demo_app_data:
+  demo_app_storage:

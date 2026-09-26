@@ -1,13 +1,14 @@
-# Keep the Koyeb Free demo awake (it sleeps after ~1h without traffic).
+# Keep the Render Free demo awake (sleeps after ~15 min without traffic).
 # Set the repository variable DEMO_URL to the public demo URL
 # (repo Settings → Secrets and variables → Actions → Variables).
 # If DEMO_URL is not set, the job succeeds immediately without pinging.
+# Timeouts never fail the job (cold starts can exceed a minute).
 
 name: Demo keep-alive
 
 on:
   schedule:
-    - cron: '*/20 * * * *'
+    - cron: '3-59/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -23,5 +24,13 @@ jobs:
           fi
           BASE="${{ vars.DEMO_URL }}"
           BASE="${BASE%/}"
-          curl -fsS --max-time 30 "${BASE}/up" > /dev/null
-          echo "Demo is awake (${BASE}/up)."
+          set +e
+          curl -fsS --max-time 90 "${BASE}/up" > /dev/null
+          STATUS=$?
+          set -e
+          if [ "$STATUS" -eq 0 ]; then
+            echo "Demo is awake (${BASE}/up)."
+          else
+            echo "Ping timed out or failed (exit ${STATUS}) — ignoring so the workflow stays green."
+          fi
+          exit 0

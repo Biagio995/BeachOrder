@@ -3,21 +3,24 @@ set -e
 
 cd /var/www/html
 
-# Single public port. Hosts like Koyeb/Render/Fly inject $PORT; default 80 so
-# the image also works where the host mandates a fixed port.
-export PORT="${PORT:-80}"
-# Internal Reverb port — never exposed, nginx proxies /app + /apps to it.
-export REVERB_SERVER_PORT="${REVERB_SERVER_PORT:-6001}"
-# Scheduler (artisan schedule:work) can be dropped on tiny hosts — the demo
-# compose disables it; per-minute jobs are additionally gated in
-# routes/console.php while DEMO_MODE=true.
-export SCHEDULER_AUTOSTART="${SCHEDULER_ENABLED:-true}"
-if [ "$SCHEDULER_AUTOSTART" = "false" ] || [ "$SCHEDULER_AUTOSTART" = "0" ]; then
-  SCHEDULER_AUTOSTART="false"
-else
-  SCHEDULER_AUTOSTART="true"
+# Single public port. Render Free (and similar hosts) inject $PORT; default
+# 10000 matches Render's conventional free-web listen port.
+export PORT="${PORT:-10000}"
+# Internal Reverb port — loopback only; nginx proxies /app + /apps to it.
+export REVERB_SERVER_PORT="${REVERB_SERVER_PORT:-8080}"
+
+# Optional queue worker (default on). Disable with DEMO_QUEUE_WORKER=false
+# or automatically when QUEUE_CONNECTION=sync (no jobs to drain).
+QUEUE_WORKER_AUTOSTART="${DEMO_QUEUE_WORKER:-true}"
+if [ "${QUEUE_CONNECTION:-}" = "sync" ]; then
+  QUEUE_WORKER_AUTOSTART="false"
 fi
-export SCHEDULER_AUTOSTART
+if [ "$QUEUE_WORKER_AUTOSTART" = "false" ] || [ "$QUEUE_WORKER_AUTOSTART" = "0" ]; then
+  QUEUE_WORKER_AUTOSTART="false"
+else
+  QUEUE_WORKER_AUTOSTART="true"
+fi
+export QUEUE_WORKER_AUTOSTART
 
 # Render the nginx vhost from the template (no gettext/envsubst dependency).
 sed -e "s/__LISTEN_PORT__/${PORT}/g" \
@@ -92,5 +95,5 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "==> Starting services (nginx :${PORT}, reverb internal :${REVERB_SERVER_PORT}, scheduler: ${SCHEDULER_AUTOSTART})"
+echo "==> Starting services (nginx :${PORT}, reverb 127.0.0.1:${REVERB_SERVER_PORT}, queue: ${QUEUE_WORKER_AUTOSTART})"
 exec "$@"

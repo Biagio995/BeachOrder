@@ -46,7 +46,7 @@ RUN composer install \
 COPY backend/ ./
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
-# ---- Runtime (nginx + php-fpm + queue + reverb + scheduler, single container) ----
+# ---- Runtime (nginx + php-fpm + optional queue + reverb, single container) ----
 FROM php:8.4-fpm-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -101,15 +101,16 @@ RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chown -R www-data:www-data /data storage bootstrap/cache /var/www/frontend \
     && chmod -R ug+rwx /data storage bootstrap/cache
 
-# Single-container demo defaults: one public $PORT (hosts inject their own;
-# default 80), SQLite on a volume path, Postgres stays available via DB_* env.
+# Single-container demo defaults: one public $PORT (Render Free injects its
+# own; default 10000), Reverb on loopback :8080, SQLite on an ephemeral path.
+# Scheduler is intentionally omitted from supervisord (demo does not need it).
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
     PHP_FPM_LISTEN=9000 \
-    PORT=80 \
-    REVERB_SERVER_PORT=6001 \
-    SCHEDULER_ENABLED=true \
+    PORT=10000 \
+    REVERB_SERVER_PORT=8080 \
+    DEMO_QUEUE_WORKER=true \
     DB_CONNECTION=sqlite \
     DB_DATABASE=/data/demo.sqlite \
     DEMO_MODE=false \
@@ -117,10 +118,10 @@ ENV APP_ENV=production \
     RUN_MIGRATIONS=true \
     RUN_SEEDERS=false
 
-EXPOSE 80
+EXPOSE 10000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:${PORT:-80}/up || exit 1
+    CMD curl -fsS http://127.0.0.1:${PORT:-10000}/up || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

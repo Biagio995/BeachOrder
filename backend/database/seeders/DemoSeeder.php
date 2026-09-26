@@ -84,7 +84,7 @@ class DemoSeeder extends Seeder
     private function seedSuperAdmin(): void
     {
         User::query()->updateOrCreate(
-            ['email' => (string) env('SUPER_ADMIN_EMAIL', 'super@servio.test')],
+            ['email' => (string) env('SUPER_ADMIN_EMAIL', 'super@demo.example')],
             [
                 'tenant_id' => null,
                 'name' => (string) env('SUPER_ADMIN_NAME', 'Platform Super Admin'),
@@ -112,6 +112,13 @@ class DemoSeeder extends Seeder
                 'password' => DemoMode::password('DEMO_STAFF_PASSWORD', 'demo kitchen staff'),
                 'role' => User::ROLE_STAFF,
                 'staff_position' => User::STAFF_POSITION_KITCHEN,
+            ],
+            [
+                'email' => (string) config('demo.bar_email', 'bar@lido-azzurra.demo'),
+                'name' => 'Bar Lido Azzurra',
+                'password' => DemoMode::password('DEMO_BAR_PASSWORD', 'demo bar staff'),
+                'role' => User::ROLE_STAFF,
+                'staff_position' => User::STAFF_POSITION_BAR,
             ],
             [
                 'email' => (string) config('demo.waiter_email', 'sala@lido-azzurra.demo'),

@@ -43,8 +43,10 @@ return [
 
     // Demo staff credentials. Passwords come from env; the 'password'
     // fallback applies to local development only, never production.
+    // Staff positions matter: kitchen/bar/waiter gates return 403 without them.
     'admin_email' => env('DEMO_ADMIN_EMAIL', 'admin@lido-azzurra.demo'),
     'staff_email' => env('DEMO_STAFF_EMAIL', 'cucina@lido-azzurra.demo'),
+    'bar_email' => env('DEMO_BAR_EMAIL', 'bar@lido-azzurra.demo'),
     'waiter_email' => env('DEMO_WAITER_EMAIL', 'sala@lido-azzurra.demo'),
 
     // Hardware integrations stay off in demo unless explicitly enabled.

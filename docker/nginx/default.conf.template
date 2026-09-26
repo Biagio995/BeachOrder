@@ -1,6 +1,6 @@
 # Rendered by docker/entrypoint.sh:
-#   __LISTEN_PORT__ -> $PORT (single public port, default 8080)
-#   __REVERB_PORT__ -> internal Reverb port (default 6001)
+#   __LISTEN_PORT__ -> $PORT (single public port, default 10000 for Render Free)
+#   __REVERB_PORT__ -> internal Reverb port (default 8080 on 127.0.0.1)
 server {
     listen __LISTEN_PORT__ default_server;
     listen [::]:__LISTEN_PORT__ default_server;
@@ -38,7 +38,7 @@ server {
 
     # Laravel Reverb (Pusher protocol WebSocket, same origin: wss on 443
     # behind the TLS proxy, plain ws to 127.0.0.1 internally).
-    # Long read timeout: Koyeb-style hosts idle WebSockets; Reverb heartbeats
+    # Long read timeout: Render Free idle WebSockets; Reverb heartbeats
     # roughly every 30s, so 300s keeps filming boards alive.
     location ^~ /app {
         proxy_http_version 1.1;
