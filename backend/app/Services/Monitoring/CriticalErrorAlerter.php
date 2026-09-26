@@ -29,7 +29,7 @@ class CriticalErrorAlerter
 
         try {
             Http::timeout(5)->post($webhook, [
-                'text' => sprintf('*[Ordequi]* %s', $message),
+                'text' => sprintf('*[%s]* %s', (string) config('app.name'), $message),
                 'attachments' => [[
                     'color' => 'danger',
                     'fields' => collect($context)->map(fn ($value, $field) => [

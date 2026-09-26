@@ -45,18 +45,22 @@ class OtpCodeNotification extends Notification
 
     private function subject(): string
     {
+        $app = (string) config('app.name');
+
         return match ($this->purpose) {
-            OtpService::PURPOSE_PASSWORD_RESET => __('Ordequi — Codice reset password'),
-            OtpService::PURPOSE_EMAIL_VERIFICATION => __('Ordequi — Codice verifica email'),
-            default => __('Ordequi — Codice OTP di test'),
+            OtpService::PURPOSE_PASSWORD_RESET => __(':name — Codice reset password', ['name' => $app]),
+            OtpService::PURPOSE_EMAIL_VERIFICATION => __(':name — Codice verifica email', ['name' => $app]),
+            default => __(':name — Codice OTP di test', ['name' => $app]),
         };
     }
 
     private function intro(): string
     {
+        $app = (string) config('app.name');
+
         return match ($this->purpose) {
-            OtpService::PURPOSE_PASSWORD_RESET => __('Usa questo codice per reimpostare la password del tuo account Ordequi:'),
-            OtpService::PURPOSE_EMAIL_VERIFICATION => __('Usa questo codice per verificare l\'email e attivare il tuo account Ordequi:'),
+            OtpService::PURPOSE_PASSWORD_RESET => __('Usa questo codice per reimpostare la password del tuo account :name:', ['name' => $app]),
+            OtpService::PURPOSE_EMAIL_VERIFICATION => __('Usa questo codice per verificare l\'email e attivare il tuo account :name:', ['name' => $app]),
             default => __('Questa è una email di test. Il codice OTP generato è:'),
         };
     }
