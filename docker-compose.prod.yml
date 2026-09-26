@@ -12,6 +12,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: /api
+        VITE_APP_NAME: ${VITE_APP_NAME:-Dalposto}
         VITE_REVERB_USE_PROXY: "true"
         VITE_REVERB_SCHEME: https
         VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-pcrxnxletfeemtelvhyn}

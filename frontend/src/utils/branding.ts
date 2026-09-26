@@ -16,7 +16,7 @@ export type BrandingColors = {
   [key: string]: string | null | undefined
 }
 
-/** Servio platform defaults (landing, auth, platform admin). */
+/** Platform defaults (landing, auth, platform admin). */
 export const PLATFORM_PRIMARY = '#0B6E6B'
 export const PLATFORM_PRIMARY_DEEP = '#084e4c'
 export const PLATFORM_ACCENT = '#E07A5F'
@@ -139,7 +139,7 @@ function paintTheme(
   document.documentElement.style.setProperty('--bo-ink', PLATFORM_INK)
 }
 
-/** Restore Servio platform look (landing / auth / platform admin). */
+/** Restore platform look (landing / auth / platform admin). */
 export function resetBrandingTheme(theme: ThemeLike) {
   paintTheme(theme, {
     primary: PLATFORM_PRIMARY,
@@ -177,8 +177,10 @@ export function applyBrandingTheme(
   })
 }
 
+import { APP_NAME } from '@/config/brand'
+
 const DEFAULT_FAVICON = '/favicon.svg'
-const DEFAULT_TITLE = 'Servio'
+const DEFAULT_TITLE = APP_NAME
 
 /** Set document title and favicon for tenant white-label surfaces. */
 export function applyPageBranding(

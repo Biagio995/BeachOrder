@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import api from '@/api/client'
 import axios from 'axios'
+import { APP_SLUG } from '@/config/brand'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -42,7 +43,7 @@ async function exportData() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `servio-export-${Date.now()}.json`
+    a.download = `${APP_SLUG}-export-${Date.now()}.json`
     a.click()
     URL.revokeObjectURL(url)
     ui.success(t('legal.exportSuccess'))

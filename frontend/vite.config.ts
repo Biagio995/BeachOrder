@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import { fileURLToPath, URL } from 'node:url'
@@ -60,7 +60,19 @@ const reverbProxy = {
   },
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Public product name, shared by JS (import.meta.env.VITE_APP_NAME, see
+  // src/config/brand.ts) and index.html (%VITE_APP_NAME%).
+  // Vite's HTML env replacement leaves placeholders for undefined variables
+  // untouched, so resolve the default here — before it runs — to guarantee
+  // the placeholder can never leak into served HTML. Empty string counts as
+  // unset. process.env wins over .env files, matching Vite's own precedence.
+  const fileEnv = loadEnv(mode, process.cwd(), '')
+  const appName =
+    process.env.VITE_APP_NAME?.trim() || fileEnv.VITE_APP_NAME?.trim() || 'Dalposto'
+  process.env.VITE_APP_NAME = appName
+
+  return {
   plugins: [
     vue(),
     stubVuetifyComponentCss(),
@@ -145,4 +157,5 @@ export default defineConfig({
       ...reverbProxy,
     },
   },
+  }
 })

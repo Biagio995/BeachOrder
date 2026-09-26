@@ -1,11 +1,11 @@
 {
   "app": {
-    "name": "Servio",
+    "name": "{appName}",
     "tagline": "Order from your table"
   },
   "landing": {
     "headline": "Order from the table — no queue at the counter.",
-    "lead": "Servio puts menu, orders and service on each table QR: faster for guests, clearer for kitchen and staff.",
+    "lead": "{appName} puts menu, orders and service on each table QR: faster for guests, clearer for kitchen and staff.",
     "ctaDemo": "Try the demo",
     "ctaStaff": "Staff login",
     "ctaRegister": "Register your venue",

@@ -1,11 +1,11 @@
 {
   "app": {
-    "name": "Servio",
+    "name": "{appName}",
     "tagline": "Bestellen am Tisch"
   },
   "landing": {
     "headline": "Am Tisch bestellen — ohne Warteschlange.",
-    "lead": "Servio bringt Menü, Bestellungen und Service auf den QR jedes Tisches: schneller für Gäste, klarer für Küche und Service.",
+    "lead": "{appName} bringt Menü, Bestellungen und Service auf den QR jedes Tisches: schneller für Gäste, klarer für Küche und Service.",
     "ctaDemo": "Demo starten",
     "ctaStaff": "Mitarbeiter-Login",
     "ctaRegister": "Lokal registrieren",

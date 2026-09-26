@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { APP_NAME } from '@/config/brand'
 
 const { t } = useI18n()
 const visible = ref(false)
@@ -34,9 +35,9 @@ onUnmounted(() => observer?.disconnect())
       <div class="hero__media" aria-hidden="true" />
       <div class="hero__veil" aria-hidden="true" />
       <div class="hero__content page-shell">
-        <p class="hero__brand display-font">{{ t('app.name') }}</p>
+        <p class="hero__brand display-font">{{ t('app.name', { appName: APP_NAME }) }}</p>
         <h1 class="hero__headline display-font">{{ t('landing.headline') }}</h1>
-        <p class="hero__lead">{{ t('landing.lead') }}</p>
+        <p class="hero__lead">{{ t('landing.lead', { appName: APP_NAME }) }}</p>
         <div class="hero__actions">
           <v-btn
             :to="'/t/azure-beach/q/table3'"
@@ -115,7 +116,7 @@ onUnmounted(() => observer?.disconnect())
 
     <footer class="landing__footer page-shell">
       <div class="landing__footer-brand">
-        <span class="display-font">{{ t('app.name') }}</span>
+        <span class="display-font">{{ t('app.name', { appName: APP_NAME }) }}</span>
         <span class="landing__footer-note">{{ t('landing.footer') }}</span>
       </div>
       <nav class="landing__footer-links" :aria-label="t('legal.footerNav')">
