@@ -1,5 +1,6 @@
 import axios from 'axios'
 import router from '@/router'
+import { getActiveLocale } from '@/plugins/i18n'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -20,8 +21,7 @@ api.interceptors.request.use((config) => {
     config.headers['X-Tenant'] = tenant
   }
 
-  const locale = localStorage.getItem('bo_locale') || 'el'
-  config.headers['X-Locale'] = locale
+  config.headers['X-Locale'] = getActiveLocale()
 
   return config
 })
