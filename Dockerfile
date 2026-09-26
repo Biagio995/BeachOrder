@@ -15,8 +15,8 @@ ARG VITE_REVERB_APP_KEY=pcrxnxletfeemtelvhyn
 ARG VITE_REVERB_HOST=
 ARG VITE_REVERB_PORT=
 ARG VITE_REVERB_SCHEME=https
-ARG VITE_DEMO_TENANT=azure-beach
-ARG VITE_DEMO_LOCATION=umbrella12
+ARG VITE_DEMO_TENANT=lido-azzurra
+ARG VITE_DEMO_LOCATION=umbrella01
 
 ENV VITE_API_URL=$VITE_API_URL \
     VITE_REVERB_USE_PROXY=$VITE_REVERB_USE_PROXY \
@@ -40,18 +40,20 @@ RUN composer install \
     --no-scripts \
     --prefer-dist \
     --no-interaction \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --ignore-platform-req=php
 
 COPY backend/ ./
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
-# ---- Runtime (nginx + php-fpm + queue + reverb) ----
-FROM php:8.2-fpm-bookworm
+# ---- Runtime (nginx + php-fpm + queue + reverb + scheduler, single container) ----
+FROM php:8.4-fpm-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         git \
         libpq-dev \
+        libsqlite3-dev \
         libzip-dev \
         libpng-dev \
         libjpeg62-turbo-dev \
@@ -66,7 +68,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gd \
         pcntl \
         pdo_pgsql \
+        pdo_sqlite \
         pgsql \
+        sqlite3 \
         zip \
     && pecl install redis \
     && docker-php-ext-enable redis \
@@ -78,33 +82,43 @@ COPY backend/ ./
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/dist /var/www/frontend
 
-COPY docker/nginx/default.conf /etc/nginx/sites-available/default
+COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/zz-local.ini
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && rm -f /etc/nginx/sites-enabled/default \
-    && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default \
     && mkdir -p \
+        /data \
         storage/app/public \
         storage/framework/cache/data \
         storage/framework/sessions \
         storage/framework/views \
         storage/logs \
         bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache /var/www/frontend \
-    && chmod -R ug+rwx storage bootstrap/cache
+    && chown -R www-data:www-data /data storage bootstrap/cache /var/www/frontend \
+    && chmod -R ug+rwx /data storage bootstrap/cache
 
+# Single-container demo defaults: one public $PORT, SQLite on a volume path,
+# Postgres stays available via DB_* env overrides (see docs/DEMO.md).
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
-    PHP_FPM_LISTEN=9000
+    PHP_FPM_LISTEN=9000 \
+    PORT=8080 \
+    REVERB_SERVER_PORT=6001 \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/data/demo.sqlite \
+    DEMO_MODE=false \
+    DEMO_SEED=false \
+    RUN_MIGRATIONS=true \
+    RUN_SEEDERS=false
 
-EXPOSE 80
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -fsS http://127.0.0.1/up || exit 1
+    CMD curl -fsS http://127.0.0.1:${PORT:-8080}/up || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

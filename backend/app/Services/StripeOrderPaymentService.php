@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Services\Monitoring\WebhookMonitor;
 use App\Services\Pos\PosOrderSyncService;
 use App\Services\Printing\PrintService;
+use App\Support\DemoMode;
 use App\Support\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,17 @@ class StripeOrderPaymentService
 
     public function isConfigured(): bool
     {
-        return filled(config('billing.stripe.secret')) && filled(config('billing.stripe.key'));
+        if (! filled(config('billing.stripe.secret')) || ! filled(config('billing.stripe.key'))) {
+            return false;
+        }
+
+        // Demo safety: live Stripe keys are treated as "not configured" so no
+        // real charge can be attempted from a public demo install.
+        if (DemoMode::enabled() && ! DemoMode::stripeKeysAreTestOnly()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function client(): StripeClient

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Tenant;
 use App\Services\Pos\PosOrderSyncService;
 use App\Services\Printing\PrintService;
+use App\Support\DemoMode;
 use Illuminate\Support\Facades\Log;
 
 class NexiXPayService
@@ -36,6 +37,11 @@ class NexiXPayService
 
     public function gatewayUrl(Tenant $tenant): string
     {
+        // Demo safety: card payments always stay on the Nexi test gateway.
+        if (DemoMode::enabled()) {
+            return self::TEST_GATEWAY;
+        }
+
         $environment = (string) ($this->config($tenant)['environment'] ?? 'test');
 
         return $environment === 'production' ? self::PRODUCTION_GATEWAY : self::TEST_GATEWAY;
