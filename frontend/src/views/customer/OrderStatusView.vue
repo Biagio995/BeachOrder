@@ -123,7 +123,7 @@ function stepIndex(status: string) {
   return steps.indexOf(status)
 }
 
-function isOnlinePayment(method?: string) {
+function isOnlinePayment(_method?: string) {
   return false
 }
 
@@ -162,7 +162,7 @@ function shouldPollPendingPayment() {
 async function ensurePaymentSynced() {
   const tenant = String(route.params.tenant || menu.tenantSlug)
   const session = String(route.query.session || menu.session)
-  const synced = await waitForOrderPayment(tenant, route.params.id, session, {
+  const synced = await waitForOrderPayment(tenant, String(route.params.id), session, {
     maxAttempts: 12,
     intervalMs: 500,
   })
