@@ -94,6 +94,7 @@ class KitchenPrintingTest extends TestCase
             'email' => 'chef@print.test',
             'password' => Hash::make('password'),
             'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_KITCHEN,
             'is_active' => true,
         ]);
         $this->staff->markEmailAsVerified();
