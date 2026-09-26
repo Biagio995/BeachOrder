@@ -174,8 +174,10 @@ export function applyBrandingTheme(
   })
 }
 
+import { APP_NAME } from '@/config/brand'
+
 const DEFAULT_FAVICON = '/favicon.svg'
-const DEFAULT_TITLE = 'Ordequi'
+const DEFAULT_TITLE = APP_NAME
 
 /** Set document title and favicon for tenant white-label surfaces. */
 export function applyPageBranding(
