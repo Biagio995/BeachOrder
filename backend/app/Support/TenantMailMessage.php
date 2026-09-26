@@ -13,7 +13,7 @@ class TenantMailMessage
             return __('Il team :tenant', ['tenant' => $tenant->name]);
         }
 
-        return __('Il team Servio');
+        return __('Il team :name', ['name' => (string) config('app.name')]);
     }
 
     public static function apply(MailMessage $mail, ?Tenant $tenant, bool $platform = false): MailMessage

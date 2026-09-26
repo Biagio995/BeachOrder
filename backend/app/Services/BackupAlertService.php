@@ -57,7 +57,8 @@ class BackupAlertService
 
         Http::timeout(10)->post($webhook, [
             'text' => sprintf(
-                ':x: Servio backup failed (%s): %s',
+                ':x: %s backup failed (%s): %s',
+                (string) config('app.name'),
                 $backupLog->filename ?: 'unknown',
                 $exception->getMessage()
             ),

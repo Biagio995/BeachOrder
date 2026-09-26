@@ -30,10 +30,10 @@ class BackupFailedNotification extends Notification
             ->error()
             ->subject(__('Backup database fallito'))
             ->greeting(__('Attenzione,'))
-            ->line(__('Il backup automatico del database Servio non è riuscito.'))
+            ->line(__('Il backup automatico del database :name non è riuscito.', ['name' => (string) config('app.name')]))
             ->line(__('Driver: :driver', ['driver' => $this->backupLog->driver]))
             ->line(__('Errore: :error', ['error' => $this->exception->getMessage()]))
             ->line(__('Controlla i log applicativi e verifica che lo storage remoto sia raggiungibile.'))
-            ->salutation(__('Il team Servio'));
+            ->salutation(__('Il team :name', ['name' => (string) config('app.name')]));
     }
 }
