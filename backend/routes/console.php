@@ -12,5 +12,10 @@ Artisan::command('inspire', function () {
 Schedule::command('privacy:purge')->dailyAt('03:00');
 Schedule::command('backup:run')->dailyAt('02:00');
 Schedule::command('monitor:health --alert')->everyFiveMinutes();
-Schedule::command('monitor:failed-jobs --alert')->everyMinute();
-Schedule::command('pos:retry-syncs')->everyMinute();
+
+// Per-minute jobs are unnecessary on the public demo (no POS, no alerting
+// channel): skip them while DEMO_MODE=true to save CPU on tiny hosts.
+if (! config('demo.enabled')) {
+    Schedule::command('monitor:failed-jobs --alert')->everyMinute();
+    Schedule::command('pos:retry-syncs')->everyMinute();
+}

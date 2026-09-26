@@ -78,9 +78,10 @@ export function useStaffRealtime(options: {
         channel.error(() => startPolling())
 
         if (name === 'orders') {
-          channel.listen('.order.updated', (payload: { order?: Order }) => {
-            if (payload?.order && options.onOrderUpdated) {
-              options.onOrderUpdated(payload.order)
+          channel.listen('.order.updated', (payload: unknown) => {
+            const order = (payload as { order?: Order } | null)?.order
+            if (order && options.onOrderUpdated) {
+              options.onOrderUpdated(order)
             } else {
               options.onEvent()
             }

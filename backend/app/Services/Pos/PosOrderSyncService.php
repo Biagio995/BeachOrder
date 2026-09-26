@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\PosIntegration;
 use App\Models\PosOrderSync;
 use App\Models\PosSyncAttempt;
+use App\Support\DemoMode;
 use App\Support\LogRedactor;
 use App\Support\TenantContext;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,12 @@ class PosOrderSyncService
 
     public function queueForOrder(Order $order): ?PosOrderSync
     {
+        // Demo kill-switch: POS stays off unless explicitly enabled, so the
+        // public demo never attempts an external POS connection.
+        if (DemoMode::enabled() && ! DemoMode::posEnabled()) {
+            return null;
+        }
+
         $integration = PosIntegration::query()
             ->where('tenant_id', $order->tenant_id)
             ->where('is_enabled', true)
