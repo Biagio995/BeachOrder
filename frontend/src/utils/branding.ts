@@ -175,7 +175,7 @@ export function applyBrandingTheme(
 }
 
 const DEFAULT_FAVICON = '/favicon.svg'
-const DEFAULT_TITLE = 'Servio'
+const DEFAULT_TITLE = 'Ordequi'
 
 /** Set document title and favicon for tenant white-label surfaces. */
 export function applyPageBranding(
