@@ -90,8 +90,8 @@ export default defineConfig(({ mode }) => {
       plugins: [
         {
           name: 'stub-vuetify-component-css-esbuild',
-          setup(build) {
-            build.onResolve({ filter: /\.css$/ }, (args) => {
+          setup(build: { onResolve: Function; onLoad: Function }) {
+            build.onResolve({ filter: /\.css$/ }, (args: { path: string; importer?: string }) => {
               const candidate = args.path.replace(/\\/g, '/')
               const importer = (args.importer || '').replace(/\\/g, '/')
 
