@@ -250,6 +250,158 @@ class KitchenPrintingTest extends TestCase
             ->assertJsonStructure(['preview']);
     }
 
+    public function test_reprint_forbidden_for_staff_without_staff_position(): void
+    {
+        $staff = User::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Positionless Staff',
+            'email' => 'positionless@print.test',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'staff_position' => null,
+            'is_active' => true,
+        ]);
+        $staff->markEmailAsVerified();
+
+        Sanctum::actingAs($staff);
+
+        $order = $this->createKitchenOrder('BO-NOPOS-1');
+
+        $this->withHeader('X-Tenant', $this->tenant->slug)
+            ->postJson("/api/orders/{$order->id}/print", ['station' => 'kitchen'])
+            ->assertForbidden();
+    }
+
+    public function test_reprint_not_found_for_staff_from_another_tenant(): void
+    {
+        $otherTenant = Tenant::query()->create([
+            'name' => 'Other Beach',
+            'slug' => 'other-beach',
+            'timezone' => 'Europe/Rome',
+            'currency' => 'EUR',
+            'default_locale' => 'it',
+            'settings' => Tenant::defaultSettings(),
+            'is_active' => true,
+        ]);
+        $this->activateTenantSubscription($otherTenant);
+
+        $otherStaff = User::query()->create([
+            'tenant_id' => $otherTenant->id,
+            'name' => 'Other Kitchen',
+            'email' => 'other-kitchen@print.test',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_KITCHEN,
+            'is_active' => true,
+        ]);
+        $otherStaff->markEmailAsVerified();
+
+        Sanctum::actingAs($otherStaff);
+
+        $order = $this->createKitchenOrder('BO-XTenant-1');
+
+        // Current behavior: tenant.user binds the caller's tenant, so BelongsToTenant
+        // scopes the Order route model to zero rows → 404 (not 403).
+        $this->withHeader('X-Tenant', $otherTenant->slug)
+            ->postJson("/api/orders/{$order->id}/print", ['station' => 'kitchen'])
+            ->assertNotFound();
+    }
+
+    public function test_reprint_allowed_for_waiter_staff_on_kitchen_order(): void
+    {
+        $waiter = User::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Waiter',
+            'email' => 'waiter@print.test',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_WAITER,
+            'is_active' => true,
+        ]);
+        $waiter->markEmailAsVerified();
+
+        Sanctum::actingAs($waiter);
+
+        $order = $this->createKitchenOrder('BO-WAITER-1');
+        $this->mockSuccessfulKitchenReprint();
+
+        // Current behavior: waiter holds orders.update_status; print has no station gate → 200.
+        $this->withHeader('X-Tenant', $this->tenant->slug)
+            ->postJson("/api/orders/{$order->id}/print", ['station' => 'kitchen'])
+            ->assertOk();
+    }
+
+    public function test_reprint_allowed_for_bar_staff_on_kitchen_order(): void
+    {
+        $bar = User::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Bar Staff',
+            'email' => 'bar@print.test',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'staff_position' => User::STAFF_POSITION_BAR,
+            'is_active' => true,
+        ]);
+        $bar->markEmailAsVerified();
+
+        Sanctum::actingAs($bar);
+
+        $order = $this->createKitchenOrder('BO-BAR-1');
+        $this->mockSuccessfulKitchenReprint();
+
+        // Current behavior: bar holds orders.update_status; print has no station gate → 200.
+        $this->withHeader('X-Tenant', $this->tenant->slug)
+            ->postJson("/api/orders/{$order->id}/print", ['station' => 'kitchen'])
+            ->assertOk();
+    }
+
+    private function createKitchenOrder(string $orderNumber): Order
+    {
+        $order = Order::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'order_number' => $orderNumber,
+            'location_id' => $this->location->id,
+            'status' => 'received',
+            'kitchen_status' => 'received',
+            'bar_status' => null,
+            'customer_session' => (string) Str::uuid(),
+            'subtotal' => 12,
+            'total' => 12,
+            'payment_method' => 'pay_at_location',
+            'payment_status' => 'unpaid',
+        ]);
+
+        $order->items()->create([
+            'product_id' => $this->product->id,
+            'station' => 'kitchen',
+            'product_name' => 'Pasta al pomodoro',
+            'quantity' => 1,
+            'unit_price' => 12,
+            'line_total' => 12,
+        ]);
+
+        return $order;
+    }
+
+    private function mockSuccessfulKitchenReprint(): void
+    {
+        $log = new OrderPrintLog([
+            'station' => 'kitchen',
+            'driver' => 'escpos_tcp',
+            'status' => OrderPrintLog::STATUS_SUCCESS,
+            'copies' => 1,
+            'is_reprint' => true,
+            'printed_at' => now(),
+        ]);
+
+        $mock = Mockery::mock(PrintService::class);
+        $mock->shouldReceive('printStation')
+            ->once()
+            ->with(Mockery::type(Order::class), 'kitchen', true)
+            ->andReturn($log);
+        $this->app->instance(PrintService::class, $mock);
+    }
+
     private function claimAccess(string $session): string
     {
         $response = $this->postJson("/api/t/{$this->tenant->slug}/locations/code/{$this->location->code}/claim", [
