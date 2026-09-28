@@ -36,9 +36,6 @@ server {
         try_files $uri =404;
     }
 
-    # Database UI (Adminer) — enabled only when PMA_PASSWORD is set
-    include /etc/nginx/snippets/pma.conf;
-
     # Laravel Reverb (Pusher protocol WebSocket, same origin: wss on 443
     # behind the TLS proxy, plain ws to 127.0.0.1 internally).
     # Long read timeout: Render Free idle WebSockets; Reverb heartbeats

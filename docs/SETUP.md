@@ -139,24 +139,6 @@ RUN_SEEDERS=true docker compose -f docker-compose.prod.yml up -d
 - Storage persistente: volume `servio_storage` (compose) oppure volume montato su `/var/www/html/storage/app`.
 - TLS termina di solito sul reverse proxy dell’host (Coolify, Traefik, nginx del provider): l’app ascolta HTTP sulla 80.
 
-### Pannello database (`/pma`)
-
-Su produzione **non** c’è phpMyAdmin di default: `/pma` era intercettato dalla SPA Vue.
-
-Dopo il deploy di questa build, Adminer è disponibile su `https://tuo-dominio/pma/` **solo** se imposti:
-
-| Variabile | Descrizione |
-|---|---|
-| `PMA_USER` | Utente HTTP basic (default `admin`) |
-| `PMA_PASSWORD` | Password HTTP basic (obbligatoria per abilitare `/pma`) |
-
-Poi in Adminer:
-
-- **MySQL**: System `MySQL`, server = host DB, user/password = `DB_*`
-- **SQLite** (come seatqui.com oggi): System `SQLite 3`, database = percorso file (es. `database/database.sqlite` o path assoluto nel container)
-
-> phpMyAdmin classico parla **solo MySQL/MariaDB**. Finché il driver online è `sqlite`, usa Adminer su `/pma` oppure migra il DB a MySQL e poi puoi collegare anche un container `phpmyadmin`.
-
 ## Sicurezza MVP
 
 - Rate limiting su login, ordini, waiter-call
