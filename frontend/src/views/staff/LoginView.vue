@@ -12,9 +12,9 @@ const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 
-// Preview/DevTunnel uses production build — still show demo tenant hints when configured.
-const showDemoAccounts =
-  import.meta.env.DEV || Boolean(import.meta.env.VITE_DEMO_TENANT)
+// Demo account hints (and prefilled credentials) are for local development only.
+// Public demo builds set VITE_DEMO_TENANT, so it must not enable them.
+const showDemoAccounts = import.meta.env.DEV
 const showDevTunnelWarning =
   import.meta.env.DEV &&
   typeof window !== 'undefined' &&
