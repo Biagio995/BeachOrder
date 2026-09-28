@@ -54,11 +54,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         libpq-dev \
         libsqlite3-dev \
+        default-libmysqlclient-dev \
         libzip-dev \
         libpng-dev \
         libjpeg62-turbo-dev \
         libfreetype6-dev \
         nginx \
+        openssl \
         supervisor \
         unzip \
         zip \
@@ -67,6 +69,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         bcmath \
         gd \
         pcntl \
+        pdo_mysql \
+        mysqli \
         pdo_pgsql \
         pdo_sqlite \
         pgsql \
@@ -74,7 +78,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && cd /tmp \
     && pecl install redis \
     && docker-php-ext-enable redis \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /var/www/pma /etc/nginx/snippets \
+    && curl -fsSL https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php \
+        -o /var/www/pma/index.php \
+    && chown -R www-data:www-data /var/www/pma
 
 WORKDIR /var/www/html
 
@@ -83,12 +91,15 @@ COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/dist /var/www/frontend
 
 COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY docker/nginx/pma-enabled.conf /etc/nginx/snippets/pma-enabled.conf
+COPY docker/nginx/pma-disabled.conf /etc/nginx/snippets/pma-disabled.conf
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/zz-local.ini
 COPY docker/php/fpm-www.conf /usr/local/etc/php-fpm.d/zz-demo.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && ln -sf /etc/nginx/snippets/pma-disabled.conf /etc/nginx/snippets/pma.conf \
     && rm -f /etc/nginx/sites-enabled/default \
     && mkdir -p \
         /data \

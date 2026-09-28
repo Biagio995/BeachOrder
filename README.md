@@ -108,7 +108,7 @@ Each business onboards as an isolated **tenant** with its own menu, branding, lo
 
 - PHP 8.2+ and Composer
 - Node.js 20+ and npm
-- A database supported by Laravel (MySQL, PostgreSQL, SQLite for local dev)
+- MySQL 8+ (phpMyAdmin via Docker on `:8081`; SQLite still works for quick tests)
 - A [Stripe](https://stripe.com) account (for payments)
 - (Optional) A [PrintNode](https://www.printnode.com) account for cloud printing
 

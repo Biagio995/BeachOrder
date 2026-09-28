@@ -22,6 +22,22 @@ else
 fi
 export QUEUE_WORKER_AUTOSTART
 
+# Behind reverse proxy / TLS terminator
+export TRUSTED_PROXIES="${TRUSTED_PROXIES:-*}"
+
+# /pma (Adminer): enable only when PMA_PASSWORD is set — never expose DB UI without auth
+if [ -n "${PMA_PASSWORD:-}" ]; then
+  PMA_USER="${PMA_USER:-admin}"
+  HASH="$(openssl passwd -apr1 "$PMA_PASSWORD")"
+  printf '%s:%s\n' "$PMA_USER" "$HASH" > /etc/nginx/.pma_htpasswd
+  ln -sf /etc/nginx/snippets/pma-enabled.conf /etc/nginx/snippets/pma.conf
+  echo "==> /pma enabled (HTTP basic auth user: ${PMA_USER})"
+else
+  ln -sf /etc/nginx/snippets/pma-disabled.conf /etc/nginx/snippets/pma.conf
+  rm -f /etc/nginx/.pma_htpasswd
+  echo "==> /pma disabled (set PMA_PASSWORD to enable Adminer)"
+fi
+
 # Render the nginx vhost from the template (no gettext/envsubst dependency).
 sed -e "s/__LISTEN_PORT__/${PORT}/g" \
     -e "s/__REVERB_PORT__/${REVERB_SERVER_PORT}/g" \
@@ -56,9 +72,6 @@ if [ -z "${APP_KEY:-}" ]; then
   echo "ERROR: APP_KEY is not set. Generate one with: php artisan key:generate --show"
   exit 1
 fi
-
-# Behind reverse proxy / TLS terminator
-export TRUSTED_PROXIES="${TRUSTED_PROXIES:-*}"
 
 php artisan storage:link --force >/dev/null 2>&1 || true
 
