@@ -15,6 +15,9 @@ frontend/.env
 presentation
 docs/commercial
 **/*.md
+# Keep the legal texts (served in-app via /api/legal/{document}).
+!docs/legal/
+!docs/legal/*.md
 **/.phpunit.result.cache
 **/phpunit.xml
 **/.DS_Store

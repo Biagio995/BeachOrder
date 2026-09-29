@@ -1,0 +1,50 @@
+# Verifies that the production image ships the legal texts served by
+# GET /api/legal/{document} (PrivacyController reads /var/www/docs/legal).
+
+name: Legal docs in image
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - docs/legal/**
+      - .github/workflows/legal-docs-image.yml
+  push:
+    branches: [main, demo-deploy]
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - docs/legal/**
+  workflow_dispatch:
+
+jobs:
+  legal-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t seatqui-legal-check .
+
+      - name: Check legal texts in /var/www/docs/legal
+        run: |
+          set -eu
+          expected="cookies.en.md cookies.it.md data-processing-roles.it.md dpa.it.md privacy.en.md privacy.it.md terms.en.md terms.it.md"
+          found=$(docker run --rm --entrypoint sh seatqui-legal-check -c 'ls /var/www/docs/legal')
+          echo "Found in image:"
+          echo "$found"
+          missing=0
+          for f in $expected; do
+            if ! echo "$found" | grep -qx "$f"; then
+              echo "::error::Missing /var/www/docs/legal/$f in image"
+              missing=1
+            fi
+          done
+          count=$(echo "$found" | grep -c '\.md$' || true)
+          if [ "$count" -ne 8 ]; then
+            echo "::error::Expected 8 legal .md files, found $count"
+            missing=1
+          fi
+          exit $missing
