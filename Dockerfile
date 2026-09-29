@@ -81,6 +81,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /var/www/html
 
 COPY backend/ ./
+# Legal texts served by PrivacyController (dirname(base_path()).'/docs/legal').
+COPY docs/legal /var/www/docs/legal
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/dist /var/www/frontend
 

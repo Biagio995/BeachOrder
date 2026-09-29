@@ -4,7 +4,7 @@
 
 ## What we use
 
-Servio **does not set profiling or tracking cookies**. We use **localStorage** and **sessionStorage** only for technically necessary service functionality.
+Seatqui **does not set profiling or tracking cookies**. We use **localStorage** and **sessionStorage** only for technically necessary service functionality.
 
 ## Storage used
 
@@ -33,4 +33,4 @@ You can clear localStorage data from your browser settings. To erase guest sessi
 
 ## Contact
 
-privacy@servio.example
+info@seatqui.com

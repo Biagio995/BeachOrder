@@ -4,7 +4,7 @@
 
 ## Cosa usiamo
 
-Servio **non installa cookie di profilazione o tracciamento**. Utilizziamo esclusivamente **localStorage** e **sessionStorage** del browser per funzionalità tecnicamente necessarie al servizio.
+Seatqui **non installa cookie di profilazione o tracciamento**. Utilizziamo esclusivamente **localStorage** e **sessionStorage** del browser per funzionalità tecnicamente necessarie al servizio.
 
 ## Storage utilizzati
 
@@ -33,4 +33,4 @@ Puoi cancellare i dati in localStorage dalle impostazioni del browser. Per cance
 
 ## Contatti
 
-privacy@servio.example
+info@seatqui.com

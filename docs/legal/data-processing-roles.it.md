@@ -4,30 +4,30 @@
 
 ## Panoramica
 
-Servio opera come piattaforma multi-tenant. I ruoli GDPR variano in base al tipo di dato e al soggetto interessato.
+Seatqui opera come piattaforma multi-tenant. I ruoli GDPR variano in base al tipo di dato e al soggetto interessato.
 
 ## Matrice dei ruoli
 
 | Scenario | Titolare (Controller) | Responsabile (Processor) |
 |----------|----------------------|--------------------------|
-| Dati staff del locale | Locale (tenant) | Servio |
-| Dati ospiti che ordinano via QR | Locale (tenant) | Servio |
-| Dati account admin Servio (super_admin) | Servio | — |
-| Dati registrazione tenant (ragione sociale) | Locale (tenant) | Servio (per onboarding) |
-| Log di audit piattaforma | Servio | Sub-responsabili hosting |
+| Dati staff del locale | Locale (tenant) | Seatqui |
+| Dati ospiti che ordinano via QR | Locale (tenant) | Seatqui |
+| Dati account admin Seatqui (super_admin) | Seatqui | — |
+| Dati registrazione tenant (ragione sociale) | Locale (tenant) | Seatqui (per onboarding) |
+| Log di audit piattaforma | Seatqui | Sub-responsabili hosting |
 
 ## Responsabilità del Titolare (ristorante)
 
 Il cliente business (ristorante) come Titolare deve:
 
-1. **Informare gli ospiti** — fornire un'informativa privacy del proprio locale (Servio fornisce il modello)
+1. **Informare gli ospiti** — fornire un'informativa privacy del proprio locale (Seatqui fornisce il modello)
 2. **Base giuridica** — definire la base giuridica per il trattamento dati ospiti (tipicamente legittimo interesse o contratto)
-3. **Diritti interessati** — gestire richieste degli ospiti; Servio fornisce strumenti tecnici (anonimizzazione sessione)
-4. **DPA** — firmare l'Accordo sul Trattamento dei Dati con Servio
+3. **Diritti interessati** — gestire richieste degli ospiti; Seatqui fornisce strumenti tecnici (anonimizzazione sessione)
+4. **DPA** — firmare l'Accordo sul Trattamento dei Dati con Seatqui
 
-## Responsabilità di Servio (Processor)
+## Responsabilità di Seatqui (Processor)
 
-Servio come Responsabile deve:
+Seatqui come Responsabile deve:
 
 1. Trattare i dati solo su istruzioni del Titolare
 2. Implementare misure di sicurezza (crittografia password, tenant isolation, rate limiting)
@@ -40,7 +40,7 @@ Servio come Responsabile deve:
 ## Flusso dati
 
 ```
-Ospite → QR → Servio API → DB tenant-scoped
+Ospite → QR → Seatqui API → DB tenant-scoped
                                     ↓
                               Locale (accesso admin)
                                     ↓
@@ -49,8 +49,8 @@ Ospite → QR → Servio API → DB tenant-scoped
 
 ## Contatti
 
-- **Privacy (Controller):** privacy@servio.example
-- **DPO / Processor:** dpo@servio.example
+- **Privacy (Controller):** info@seatqui.com
+- **DPO / Processor:** info@seatqui.com
 
 ## Riferimenti
 
