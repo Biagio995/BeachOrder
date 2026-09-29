@@ -1,7 +1,7 @@
 # Privacy Policy
 
 **Last updated:** 10 August 2026  
-**Data controller:** Servio (privacy@servio.example)
+**Data controller:** Servio (info@seatqui.com)
 
 ## 1. Who we are
 
@@ -57,7 +57,7 @@ Under the GDPR (Art. 15–22) you have the right to:
 - **Restriction** and **objection** to processing
 - **Complaint** to your supervisory authority
 
-To exercise your rights: privacy@servio.example
+To exercise your rights: info@seatqui.com
 
 ## 6. Cookies and local storage
 

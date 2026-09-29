@@ -47,4 +47,4 @@ I presenti Termini sono regolati dalla legge italiana. Foro competente: [città 
 
 ## 10. Contatti
 
-Per informazioni: privacy@servio.example
+Per informazioni: info@seatqui.com

@@ -1,7 +1,7 @@
 # Informativa sulla Privacy
 
 **Ultimo aggiornamento:** 10 agosto 2026  
-**Titolare del trattamento:** Servio (privacy@servio.example)
+**Titolare del trattamento:** Servio (info@seatqui.com)
 
 ## 1. Chi siamo
 
@@ -57,7 +57,7 @@ Ai sensi del GDPR (Art. 15–22) hai diritto a:
 - **Limitazione** e **opposizione** al trattamento
 - **Reclamo** all'Autorità Garante (www.garanteprivacy.it)
 
-Per esercitare i diritti: privacy@servio.example
+Per esercitare i diritti: info@seatqui.com
 
 ## 6. Cookie e storage locale
 

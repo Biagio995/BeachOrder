@@ -33,4 +33,4 @@ You can clear localStorage data from your browser settings. To erase guest sessi
 
 ## Contact
 
-privacy@servio.example
+info@seatqui.com

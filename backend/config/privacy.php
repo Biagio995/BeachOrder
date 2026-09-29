@@ -96,14 +96,14 @@ return [
     ],
 
     'controller' => [
-        'name' => env('PRIVACY_CONTROLLER_NAME', 'Servio'),
-        'email' => env('PRIVACY_CONTROLLER_EMAIL', 'privacy@servio.example'),
+        'name' => env('PRIVACY_CONTROLLER_NAME', 'Seatqui'),
+        'email' => env('PRIVACY_CONTROLLER_EMAIL', 'info@seatqui.com'),
         'address' => env('PRIVACY_CONTROLLER_ADDRESS', ''),
     ],
 
     'processor' => [
-        'name' => env('PRIVACY_PROCESSOR_NAME', 'Servio Platform'),
-        'email' => env('PRIVACY_PROCESSOR_EMAIL', 'dpo@servio.example'),
+        'name' => env('PRIVACY_PROCESSOR_NAME', 'Seatqui'),
+        'email' => env('PRIVACY_PROCESSOR_EMAIL', 'info@seatqui.com'),
     ],
 
     /** Fields redacted from audit log snapshots. */

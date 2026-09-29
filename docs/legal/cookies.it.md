@@ -33,4 +33,4 @@ Puoi cancellare i dati in localStorage dalle impostazioni del browser. Per cance
 
 ## Contatti
 
-privacy@servio.example
+info@seatqui.com

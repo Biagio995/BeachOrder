@@ -65,7 +65,7 @@ Nel `backend/.env`:
 MAIL_MAILER=smtp
 MAIL_HOST=127.0.0.1
 MAIL_PORT=1025
-MAIL_FROM_ADDRESS="hello@servio.test"
+MAIL_FROM_ADDRESS="info@seatqui.com"
 ```
 
 Invio di prova (entrambe le mail):

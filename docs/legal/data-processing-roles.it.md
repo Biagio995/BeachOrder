@@ -49,8 +49,8 @@ Ospite → QR → Servio API → DB tenant-scoped
 
 ## Contatti
 
-- **Privacy (Controller):** privacy@servio.example
-- **DPO / Processor:** dpo@servio.example
+- **Privacy (Controller):** info@seatqui.com
+- **DPO / Processor:** info@seatqui.com
 
 ## Riferimenti
 

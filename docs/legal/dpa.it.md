@@ -6,7 +6,7 @@
 ## Parti
 
 - **Titolare del trattamento ("Cliente"):** [Ragione sociale del locale / ristorante]
-- **Responsabile del trattamento ("Servio"):** Servio Platform (dpo@servio.example)
+- **Responsabile del trattamento ("Servio"):** Servio Platform (info@seatqui.com)
 
 ## 1. Oggetto e durata
 

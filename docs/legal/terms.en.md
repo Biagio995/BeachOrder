@@ -47,4 +47,4 @@ These Terms are governed by Italian law. Competent court: [registered office cit
 
 ## 10. Contact
 
-For information: privacy@servio.example
+For information: info@seatqui.com
