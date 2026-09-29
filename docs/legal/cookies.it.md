@@ -4,7 +4,7 @@
 
 ## Cosa usiamo
 
-Servio **non installa cookie di profilazione o tracciamento**. Utilizziamo esclusivamente **localStorage** e **sessionStorage** del browser per funzionalità tecnicamente necessarie al servizio.
+Seatqui **non installa cookie di profilazione o tracciamento**. Utilizziamo esclusivamente **localStorage** e **sessionStorage** del browser per funzionalità tecnicamente necessarie al servizio.
 
 ## Storage utilizzati
 

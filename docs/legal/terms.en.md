@@ -4,7 +4,7 @@
 
 ## 1. Subject
 
-These Terms govern the use of the Servio platform ("Service") by business customers (restaurants, bars, pizzerias and other table-service venues) and their authorised staff.
+These Terms govern the use of the Seatqui platform ("Service") by business customers (restaurants, bars, pizzerias and other table-service venues) and their authorised staff.
 
 ## 2. Registration and accounts
 
@@ -23,7 +23,7 @@ The Customer agrees to:
 
 ## 4. Intellectual property
 
-Servio and its software remain the property of the provider. The Customer retains ownership of their data (menu, orders, branding).
+Seatqui and its software remain the property of the provider. The Customer retains ownership of their data (menu, orders, branding).
 
 ## 5. Availability and limitations
 
@@ -31,7 +31,7 @@ The Service is provided "as is" with reasonable availability targets. Interrupti
 
 ## 6. Liability
 
-Servio is not liable for indirect damages. Total liability is limited to fees paid by the Customer in the last 12 months, except for wilful misconduct or gross negligence.
+Seatqui is not liable for indirect damages. Total liability is limited to fees paid by the Customer in the last 12 months, except for wilful misconduct or gross negligence.
 
 ## 7. Term and termination
 
@@ -39,7 +39,7 @@ The contract runs indefinitely unless otherwise agreed. Either party may termina
 
 ## 8. Changes
 
-Servio may update these Terms with 30 days' notice via email or in-app notification.
+Seatqui may update these Terms with 30 days' notice via email or in-app notification.
 
 ## 9. Governing law
 

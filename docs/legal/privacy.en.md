@@ -1,11 +1,11 @@
 # Privacy Policy
 
 **Last updated:** 10 August 2026  
-**Data controller:** Servio (info@seatqui.com)
+**Data controller:** Seatqui (info@seatqui.com)
 
 ## 1. Who we are
 
-Servio is a SaaS platform enabling restaurants, bars and pizzerias to manage QR-code orders. For guest ordering data, the **data controller** is the individual venue (tenant); Servio acts as **data processor** on behalf of the business customer.
+Seatqui is a SaaS platform enabling restaurants, bars and pizzerias to manage QR-code orders. For guest ordering data, the **data controller** is the individual venue (tenant); Seatqui acts as **data processor** on behalf of the business customer.
 
 ## 2. Data we collect
 
@@ -61,7 +61,7 @@ To exercise your rights: info@seatqui.com
 
 ## 6. Cookies and local storage
 
-Servio **does not use tracking cookies**. It uses localStorage/sessionStorage for essential functionality (order session, cart, language, consent). See our [Cookie Policy](/cookies).
+Seatqui **does not use tracking cookies**. It uses localStorage/sessionStorage for essential functionality (order session, cart, language, consent). See our [Cookie Policy](/cookies).
 
 ## 7. Sub-processors
 

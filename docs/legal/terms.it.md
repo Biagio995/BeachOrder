@@ -4,7 +4,7 @@
 
 ## 1. Oggetto
 
-I presenti Termini regolano l'utilizzo della piattaforma Servio ("Servizio") da parte dei clienti business (ristoranti, bar, pizzerie e locali con servizio al tavolo) e del relativo personale autorizzato.
+I presenti Termini regolano l'utilizzo della piattaforma Seatqui ("Servizio") da parte dei clienti business (ristoranti, bar, pizzerie e locali con servizio al tavolo) e del relativo personale autorizzato.
 
 ## 2. Registrazione e account
 
@@ -23,7 +23,7 @@ Il Cliente si impegna a:
 
 ## 4. Proprietà intellettuale
 
-Servio e il relativo software restano di proprietà del fornitore. Il Cliente mantiene la proprietà dei propri dati (menu, ordini, branding).
+Seatqui e il relativo software restano di proprietà del fornitore. Il Cliente mantiene la proprietà dei propri dati (menu, ordini, branding).
 
 ## 5. Disponibilità e limitazioni
 
@@ -31,7 +31,7 @@ Il Servizio è fornito "as is" con obiettivi di disponibilità ragionevoli. Poss
 
 ## 6. Responsabilità
 
-Servio non è responsabile per danni indiretti. La responsabilità complessiva è limitata all'importo pagato dal Cliente negli ultimi 12 mesi, salvo dolo o colpa grave.
+Seatqui non è responsabile per danni indiretti. La responsabilità complessiva è limitata all'importo pagato dal Cliente negli ultimi 12 mesi, salvo dolo o colpa grave.
 
 ## 7. Durata e recesso
 
@@ -39,7 +39,7 @@ Il contratto ha durata a tempo indeterminato salvo diverso accordo. Ciascuna par
 
 ## 8. Modifiche
 
-Servio può aggiornare i Termini con preavviso di 30 giorni via email o notifica in-app.
+Seatqui può aggiornare i Termini con preavviso di 30 giorni via email o notifica in-app.
 
 ## 9. Legge applicabile
 
