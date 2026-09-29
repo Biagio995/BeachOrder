@@ -1,11 +1,11 @@
 # Informativa sulla Privacy
 
 **Ultimo aggiornamento:** 10 agosto 2026  
-**Titolare del trattamento:** Servio (info@seatqui.com)
+**Titolare del trattamento:** Seatqui (info@seatqui.com)
 
 ## 1. Chi siamo
 
-Servio è una piattaforma SaaS che consente a ristoranti, bar e pizzerie di gestire ordini tramite codice QR. Per i dati degli ospiti che ordinano dal proprio tavolo o postazione, il **Titolare del trattamento** è il singolo locale (tenant); Servio agisce come **Responsabile del trattamento** per conto del cliente business.
+Seatqui è una piattaforma SaaS che consente a ristoranti, bar e pizzerie di gestire ordini tramite codice QR. Per i dati degli ospiti che ordinano dal proprio tavolo o postazione, il **Titolare del trattamento** è il singolo locale (tenant); Seatqui agisce come **Responsabile del trattamento** per conto del cliente business.
 
 ## 2. Dati che raccogliamo
 
@@ -61,7 +61,7 @@ Per esercitare i diritti: info@seatqui.com
 
 ## 6. Cookie e storage locale
 
-Servio **non utilizza cookie di tracciamento**. Usa localStorage/sessionStorage per funzionalità essenziali (sessione ordine, carrello, lingua, consenso). Vedi la [Cookie Policy](/cookies).
+Seatqui **non utilizza cookie di tracciamento**. Usa localStorage/sessionStorage per funzionalità essenziali (sessione ordine, carrello, lingua, consenso). Vedi la [Cookie Policy](/cookies).
 
 ## 7. Sub-responsabili
 
